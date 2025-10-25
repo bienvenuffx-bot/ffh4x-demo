@@ -2,41 +2,136 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FFH4X - Demo Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FFH4X – Panneau d’Options</title>
   <style>
-    body{background:#081020;color:#fff;font-family:sans-serif;margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh}
-    .panel{background:#0f1f3a;border-radius:12px;padding:20px;width:350px;box-shadow:0 0 15px rgba(0,0,0,0.4)}
-    .header{display:flex;align-items:center;gap:10px}
-    .logo{background:#1e90ff;border-radius:8px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:22px}
-    h1{margin:0;font-size:16px}
-    .sub{font-size:13px;color:#9fb3d0}
-    .toggle{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.05);padding:10px;margin:8px 0;border-radius:8px}
-    .btn{background:#1e90ff;border:none;color:#fff;padding:10px;width:100%;border-radius:8px;margin-top:10px;font-weight:bold}
+    :root{
+      --bg:#0f0f15; --card:#1a1b25; --card-border:#242638;
+      --text:#eaeaf2; --muted:#b4b7c9; --accent:#8be28b; --pill:#ffffff;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#000 0%,#12121b 100%);
+      color:var(--text);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;
+      display:grid;place-items:center;padding:24px;min-height:100vh;}
+
+    .phone{width:380px;max-width:95vw;background:var(--bg);border-radius:24px;
+      padding:20px 16px 28px;box-shadow:0 20px 60px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.04)}
+
+    .header{text-align:center;margin-bottom:24px;}
+    .header h1{margin:0;font-size:22px;font-weight:700;color:var(--accent);}
+    .header p{margin:6px 0 0;color:var(--muted);font-size:14px;}
+
+    .stack{display:flex;flex-direction:column;gap:14px;margin-bottom:22px}
+
+    /* Bouton tuile */
+    .tile{
+      width:100%; display:flex; align-items:center; justify-content:space-between;
+      padding:16px 14px; background:var(--card); border:1px solid var(--card-border);
+      border-radius:14px; text-align:left; cursor:pointer;
+      transition:border-color .15s ease, background .15s ease;
+    }
+    .tile:focus-visible{outline:2px solid #7aa2ff; outline-offset:2px}
+    .tile .txt h3{margin:0 0 4px;font-size:16px;font-weight:650;letter-spacing:.2px}
+    .tile .txt p{margin:0;font-size:13px;color:var(--muted)}
+    .check{width:26px;height:26px;min-width:26px;border-radius:999px;display:grid;place-items:center;border:1.5px solid #72757e;background:transparent;transition:all .15s ease}
+    .check svg{display:block;opacity:0;transition:opacity .15s ease}
+
+    /* État actif */
+    .tile[aria-pressed="true"]{border-color:#2c3a2c;background:#171922}
+    .tile[aria-pressed="true"] .check{border-color:var(--accent);background:linear-gradient(180deg, rgba(139,226,139,.12), rgba(139,226,139,.04))}
+    .tile[aria-pressed="true"] .check svg{opacity:1}
+    .cta{display:block;width:100%;padding:16px 18px;background:var(--pill);color:#0f0f15;text-align:center;font-weight:800;border:none;border-radius:999px;cursor:pointer;box-shadow:0 6px 16px rgba(255,255,255,.08)}
+    .cta:active{transform:translateY(1px)}
+
+    footer{margin-top:20px;text-align:center;font-size:13px;color:#888;}
+    footer span{background:linear-gradient(90deg,#8be28b,#6affc6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:600;}
   </style>
 </head>
 <body>
-  <div class="panel">
-    <div class="header">
-      <div class="logo">F</div>
-      <div>
-        <h1>FFH4X - @Pdz7z</h1>
-        <div class="sub">Painel External | Version Mobile</div>
-      </div>
+  <main class="phone" role="main" aria-label="Menu Free Fire">
+    <header class="header">
+      <h1>FFH4X – Panneau</h1>
+      <p>Interface de configuration avancée</p>
+    </header>
+
+    <div class="stack" id="options">
+      <button class="tile" type="button" aria-pressed="false" data-key="mira">
+        <span class="txt">
+          <h3>Melhorar Mira Scope</h3>
+          <p>Melhora a mira quando aberta.</p>
+        </span>
+        <span class="check" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8be28b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </span>
+      </button>
+
+      <button class="tile" type="button" aria-pressed="false" data-key="sens">
+        <span class="txt">
+          <h3>Calibrar Sensibilidade</h3>
+          <p>Melhora a sua sensibilidade.</p>
+        </span>
+        <span class="check" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8be28b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </span>
+      </button>
+
+      <button class="tile" type="button" aria-pressed="false" data-key="recuo">
+        <span class="txt">
+          <h3>Diminuir Recuo</h3>
+          <p>Diminui o recuo de qualquer arma.</p>
+        </span>
+        <span class="check" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8be28b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </span>
+      </button>
+
+      <button class="tile" type="button" aria-pressed="false" data-key="precisao">
+        <span class="txt">
+          <h3>Aumentar Precisão</h3>
+          <p>Aumenta a precisão de qualquer arma.</p>
+        </span>
+        <span class="check" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8be28b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </span>
+      </button>
     </div>
 
-    <div class="toggle"><span>No Recoil</span><input type="checkbox"></div>
-    <div class="toggle"><span>Faciliter les tirs à la tête</span><input type="checkbox"></div>
-    <div class="toggle"><span>Aimlock 100%</span><input type="checkbox"></div>
-    <div class="toggle"><span>Précision Full</span><input type="checkbox"></div>
-    <div class="toggle"><span>Mira Calibrada</span><input type="checkbox"></div>
+    <button class="cta" id="open">Abrir Free Fire Normal</button>
 
-    <button class="btn" onclick="alert('Ceci est une démo — aucune fonction réelle n’est injectée.')">
-      INJECTER (DEMO)
-    </button>
-    <p style="text-align:center;font-size:12px;color:#9fb3d0;margin-top:10px">
-      © PDZ7Z — Démo UI uniquement.
-    </p>
-  </div>
+    <footer>
+      Créé avec passion par <span>Mohamed</span>
+    </footer>
+  </main>
+
+  <script>
+    const state = { mira:false, sens:false, recuo:false, precisao:false };
+
+    document.querySelectorAll('.tile').forEach(btn => {
+      btn.addEventListener('click', () => toggle(btn));
+      btn.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(btn); }
+      });
+    });
+
+    function toggle(btn){
+      const key = btn.dataset.key;
+      const active = btn.getAttribute('aria-pressed') === 'true';
+      btn.setAttribute('aria-pressed', String(!active));
+      state[key] = !active;
+      console.log('options', state);
+    }
+
+    document.getElementById('open').addEventListener('click', () => {
+      alert('Options actives : ' + JSON.stringify(state, null, 2));
+    });
+  </script>
 </body>
 </html>
