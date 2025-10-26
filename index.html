@@ -1,137 +1,385 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FFH4X – Panneau d’Options</title>
-  <style>
-    :root{
-      --bg:#0f0f15; --card:#1a1b25; --card-border:#242638;
-      --text:#eaeaf2; --muted:#b4b7c9; --accent:#8be28b; --pill:#ffffff;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,#000 0%,#12121b 100%);
-      color:var(--text);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;
-      display:grid;place-items:center;padding:24px;min-height:100vh;}
-
-    .phone{width:380px;max-width:95vw;background:var(--bg);border-radius:24px;
-      padding:20px 16px 28px;box-shadow:0 20px 60px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.04)}
-
-    .header{text-align:center;margin-bottom:24px;}
-    .header h1{margin:0;font-size:22px;font-weight:700;color:var(--accent);}
-    .header p{margin:6px 0 0;color:var(--muted);font-size:14px;}
-
-    .stack{display:flex;flex-direction:column;gap:14px;margin-bottom:22px}
-
-    /* Bouton tuile */
-    .tile{
-      width:100%; display:flex; align-items:center; justify-content:space-between;
-      padding:16px 14px; background:var(--card); border:1px solid var(--card-border);
-      border-radius:14px; text-align:left; cursor:pointer;
-      transition:border-color .15s ease, background .15s ease;
-    }
-    .tile:focus-visible{outline:2px solid #7aa2ff; outline-offset:2px}
-    .tile .txt h3{margin:0 0 4px;font-size:16px;font-weight:650;letter-spacing:.2px}
-    .tile .txt p{margin:0;font-size:13px;color:var(--muted)}
-    .check{width:26px;height:26px;min-width:26px;border-radius:999px;display:grid;place-items:center;border:1.5px solid #72757e;background:transparent;transition:all .15s ease}
-    .check svg{display:block;opacity:0;transition:opacity .15s ease}
-
-    /* État actif */
-    .tile[aria-pressed="true"]{border-color:#2c3a2c;background:#171922}
-    .tile[aria-pressed="true"] .check{border-color:var(--accent);background:linear-gradient(180deg, rgba(139,226,139,.12), rgba(139,226,139,.04))}
-    .tile[aria-pressed="true"] .check svg{opacity:1}
-    .cta{display:block;width:100%;padding:16px 18px;background:var(--pill);color:#0f0f15;text-align:center;font-weight:800;border:none;border-radius:999px;cursor:pointer;box-shadow:0 6px 16px rgba(255,255,255,.08)}
-    .cta:active{transform:translateY(1px)}
-
-    footer{margin-top:20px;text-align:center;font-size:13px;color:#888;}
-    footer span{background:linear-gradient(90deg,#8be28b,#6affc6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:600;}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PronosVIP — Pronostics quotidiens</title>
+<meta name="description" content="Pronostics VIP quotidiens basés sur les données. Historique transparent. Jouez responsable.">
+<link rel="icon" href="data:,">
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <main class="phone" role="main" aria-label="Menu Free Fire">
-    <header class="header">
-      <h1>FFH4X – Panneau</h1>
-      <p>Interface de configuration avancée</p>
-    </header>
-
-    <div class="stack" id="options">
-      <button class="tile" type="button" aria-pressed="false" data-key="mira">
-        <span class="txt">
-          <h3>Melhorar Mira Scope</h3>
-          <p>Melhora a mira quando aberta.</p>
-        </span>
-        <span class="check" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8be28b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-        </span>
-      </button>
-
-      <button class="tile" type="button" aria-pressed="false" data-key="sens">
-        <span class="txt">
-          <h3>Calibrar Sensibilidade</h3>
-          <p>Melhora a sua sensibilidade.</p>
-        </span>
-        <span class="check" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8be28b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-        </span>
-      </button>
-
-      <button class="tile" type="button" aria-pressed="false" data-key="recuo">
-        <span class="txt">
-          <h3>Diminuir Recuo</h3>
-          <p>Diminui o recuo de qualquer arma.</p>
-        </span>
-        <span class="check" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8be28b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-        </span>
-      </button>
-
-      <button class="tile" type="button" aria-pressed="false" data-key="precisao">
-        <span class="txt">
-          <h3>Aumentar Precisão</h3>
-          <p>Aumenta a precisão de qualquer arma.</p>
-        </span>
-        <span class="check" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8be28b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-        </span>
-      </button>
+<body class="bg-[#0B0F13] text-[#E6EDF3]">
+  <!-- HEADER -->
+  <header class="border-b border-white/10 bg-[#0B0F13]/90 sticky top-0 z-50 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="#home" class="text-xl font-bold text-[#38B6FF]">PronosVIP</a>
+      <nav class="flex items-center gap-5 text-sm">
+        <a class="hover:text-[#38B6FF]" href="#home">Accueil</a>
+        <a class="hover:text-[#38B6FF]" href="#vip">VIP</a>
+        <a class="hover:text-[#38B6FF]" href="#historique">Historique</a>
+        <a class="hover:text-[#38B6FF]" href="#abonnement">Abonnement</a>
+        <a id="accountLink" class="inline-flex items-center px-4 py-2 rounded-md bg-[#38B6FF] text-black font-semibold hover:opacity-90 transition" href="#login">Connexion</a>
+      </nav>
     </div>
+  </header>
 
-    <button class="cta" id="open">Abrir Free Fire Normal</button>
+  <!-- MAIN -->
+  <main class="max-w-6xl mx-auto px-4">
 
-    <footer>
-      Créé avec passion par <span>Mohamed</span>
-    </footer>
+    <!-- HOME -->
+    <section id="home" data-route class="py-14 sm:py-20">
+      <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight text-center">
+        Pronostics VIP quotidiens, prêts à jouer
+      </h1>
+      <p class="mt-4 text-white/70 max-w-2xl mx-auto text-center">
+        Analyses basées sur les statistiques, la forme, les absences et le contexte. Historique transparent. Aucune promesse de gain.
+      </p>
+      <div class="mt-8 flex justify-center gap-3">
+        <a href="#vip" class="inline-flex items-center px-6 py-3 rounded-md bg-[#38B6FF] text-black font-semibold hover:opacity-90">Voir les pronos du jour</a>
+        <a href="#abonnement" class="inline-flex items-center px-6 py-3 rounded-md border border-white/15 hover:bg-white/5">S’abonner</a>
+      </div>
+
+      <!-- KPIs -->
+      <div class="grid sm:grid-cols-3 gap-4 mt-12">
+        <div class="rounded-lg border border-white/10 bg-[#121820]/80 p-5 text-center">
+          <div class="text-sm text-white/60">Taux de réussite (30j)</div>
+          <div class="text-3xl font-semibold mt-1" id="kpiWin">62%</div>
+        </div>
+        <div class="rounded-lg border border-white/10 bg-[#121820]/80 p-5 text-center">
+          <div class="text-sm text-white/60">Yield (30j)</div>
+          <div class="text-3xl font-semibold mt-1" id="kpiYield">+7.8%</div>
+        </div>
+        <div class="rounded-lg border border-white/10 bg-[#121820]/80 p-5 text-center">
+          <div class="text-sm text-white/60">Cote moyenne</div>
+          <div class="text-3xl font-semibold mt-1" id="kpiOdds">1.82</div>
+        </div>
+      </div>
+
+      <!-- Méthode -->
+      <div class="grid md:grid-cols-3 gap-4 mt-10">
+        <div class="rounded-lg border border-white/10 bg-[#121820]/80 p-5">
+          <h3 class="font-semibold text-lg">Forme & stats avancées</h3>
+          <p class="text-white/70 mt-2 text-sm">xG, tirs cadrés, xGA, dynamiques domicile/extérieur.</p>
+        </div>
+        <div class="rounded-lg border border-white/10 bg-[#121820]/80 p-5">
+          <h3 class="font-semibold text-lg">Contexte & blessures</h3>
+          <p class="text-white/70 mt-2 text-sm">Absences, récupération, motivation, calendrier, météo.</p>
+        </div>
+        <div class="rounded-lg border border-white/10 bg-[#121820]/80 p-5">
+          <h3 class="font-semibold text-lg">Gestion & transparence</h3>
+          <p class="text-white/70 mt-2 text-sm">Historique public, unités, aucun pari “garanti”.</p>
+        </div>
+      </div>
+
+      <!-- Teaser -->
+      <section class="mt-12">
+        <h2 class="text-2xl font-semibold mb-4 border-l-4 border-[#38B6FF] pl-3">Exemples du jour</h2>
+        <div class="grid md:grid-cols-2 gap-4" id="teaserList">
+          <!-- Injecté par JS -->
+        </div>
+        <div class="text-center mt-6">
+          <a class="inline-flex items-center px-6 py-3 rounded-md bg-[#38B6FF] text-black font-semibold hover:opacity-90" href="#vip">Voir tout (VIP)</a>
+        </div>
+      </section>
+    </section>
+
+    <!-- VIP -->
+    <section id="vip" data-route class="py-8 hidden">
+      <div class="flex flex-wrap items-center gap-3">
+        <h1 class="text-2xl font-semibold">Pronostics VIP du jour</h1>
+        <span class="text-xs px-2 py-0.5 rounded border border-white/15" id="vipDate">—</span>
+        <span class="text-xs px-2 py-0.5 rounded border border-white/15">Maj: 08:00</span>
+      </div>
+
+      <!-- Filtres -->
+      <div class="mt-4 flex flex-wrap gap-2 text-sm">
+        <button class="text-xs px-2 py-0.5 rounded border border-white/15" data-filter="all">Tous</button>
+        <button class="text-xs px-2 py-0.5 rounded border border-white/15" data-filter="football">Football</button>
+        <button class="text-xs px-2 py-0.5 rounded border border-white/15" data-filter="basket">Basket</button>
+        <button class="text-xs px-2 py-0.5 rounded border border-white/15" data-filter="tennis">Tennis</button>
+        <button class="text-xs px-2 py-0.5 rounded border border-white/15" data-filter="70">Confiance 70%+</button>
+      </div>
+
+      <!-- Liste -->
+      <section class="grid md:grid-cols-2 gap-4 mt-6" id="vipList">
+        <!-- Injecté par JS -->
+      </section>
+
+      <p class="text-xs text-white/50 mt-6">Les cotes/analyses ici sont des données de démonstration. Pour la version pro, branche une API sportive + paywall.</p>
+    </section>
+
+    <!-- HISTORIQUE -->
+    <section id="historique" data-route class="py-8 hidden">
+      <h1 class="text-2xl font-semibold">Historique</h1>
+
+      <div class="grid md:grid-cols-3 gap-4 mt-4">
+        <div class="rounded-lg border border-white/10 bg-[#121820]/80 p-5 text-center">
+          <div class="text-sm text-white/60">Win rate (30j)</div>
+          <div class="text-3xl font-semibold mt-1" id="hWin">62%</div>
+        </div>
+        <div class="rounded-lg border border-white/10 bg-[#121820]/80 p-5 text-center">
+          <div class="text-sm text-white/60">Yield (30j)</div>
+          <div class="text-3xl font-semibold mt-1" id="hYield">+7.8%</div>
+        </div>
+        <div class="rounded-lg border border-white/10 bg-[#121820]/80 p-5 text-center">
+          <div class="text-sm text-white/60">Unités (30j)</div>
+          <div class="text-3xl font-semibold mt-1" id="hUnits">+18.4</div>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-white/10 bg-[#121820]/80 p-5 mt-6">
+        <div class="flex flex-wrap items-center gap-3">
+          <label class="text-sm text-white/70">Période:</label>
+          <input type="date" class="bg-transparent border border-white/15 rounded px-3 py-1 text-sm"/>
+          <input type="date" class="bg-transparent border border-white/15 rounded px-3 py-1 text-sm"/>
+          <button class="text-sm px-3 py-1 rounded bg-[#38B6FF] text-black font-semibold">Filtrer</button>
+        </div>
+        <div class="mt-4 overflow-x-auto">
+          <table class="min-w-full text-sm" id="historyTable">
+            <thead class="text-white/60">
+              <tr>
+                <th class="text-left py-2 pr-4">Date</th>
+                <th class="text-left py-2 pr-4">Match</th>
+                <th class="text-left py-2 pr-4">Pari</th>
+                <th class="text-left py-2 pr-4">Cote</th>
+                <th class="text-left py-2 pr-4">Résultat</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="text-xs text-white/50 mt-3">Historique démo (données factices).</p>
+      </div>
+    </section>
+
+    <!-- ABONNEMENT -->
+    <section id="abonnement" data-route class="py-10 hidden">
+      <h1 class="text-3xl font-semibold text-center">Accès VIP</h1>
+      <p class="text-white/70 text-center mt-2">Analyses quotidiennes, picks exclusifs, historique complet.</p>
+
+      <div class="max-w-xl mx-auto mt-8 rounded-lg border border-white/10 bg-[#121820]/80 p-6">
+        <div class="flex items-baseline justify-between">
+          <h2 class="text-xl font-semibold">Mensuel</h2>
+          <div class="text-3xl font-bold">19,90€<span class="text-base font-normal text-white/60">/mois</span></div>
+        </div>
+        <ul class="list-disc list-inside mt-4 space-y-2 text-white/80">
+          <li>Pronostics VIP quotidiens</li>
+          <li>Analyses fondées sur les données</li>
+          <li>Email récap quotidien</li>
+          <li>Historique complet</li>
+        </ul>
+        <a href="#login" class="mt-6 w-full justify-center inline-flex items-center px-5 py-3 rounded-md bg-[#38B6FF] text-black font-semibold hover:opacity-90">S’abonner</a>
+        <p class="text-xs text-white/50 mt-3 text-center">Contenu informatif, ne garantit aucun gain. Annulable à tout moment.</p>
+      </div>
+    </section>
+
+    <!-- LOGIN -->
+    <section id="login" data-route class="py-10 hidden">
+      <h1 class="text-2xl font-semibold text-center">Connexion</h1>
+      <form class="max-w-md mx-auto rounded-lg border border-white/10 bg-[#121820]/80 p-6 mt-6 space-y-4"
+            onsubmit="event.preventDefault(); fakeLogin();">
+        <div>
+          <label class="text-sm text-white/70">Email</label>
+          <input id="email" type="email" class="mt-1 w-full bg-transparent border border-white/15 rounded px-3 py-2" placeholder="toi@email.com" required />
+        </div>
+        <div>
+          <label class="text-sm text-white/70">Mot de passe</label>
+          <input id="pwd" type="password" class="mt-1 w-full bg-transparent border border-white/15 rounded px-3 py-2" placeholder="••••••••" required />
+        </div>
+        <button class="w-full inline-flex items-center px-5 py-3 rounded-md bg-[#38B6FF] text-black font-semibold hover:opacity-90">Se connecter</button>
+        <p class="text-sm text-center text-white/60">Démo sans backend. Le bouton active un mode “connecté”.</p>
+      </form>
+    </section>
+
+    <!-- ADMIN (Démo UI) -->
+    <section id="admin" data-route class="py-8 hidden">
+      <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-semibold">Admin (démo)</h1>
+        <button class="text-sm px-3 py-1 rounded border border-white/15 hover:bg-white/5" onclick="fakeLogout()">Se déconnecter</button>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-6 mt-6">
+        <section class="rounded-lg border border-white/10 bg-[#121820]/80 p-5">
+          <h2 class="text-lg font-semibold">Actions quotidiennes</h2>
+          <button class="mt-3 w-full inline-flex items-center px-4 py-2 rounded-md bg-[#38B6FF] text-black font-semibold hover:opacity-90" onclick="importMatches()">Importer les matchs du jour</button>
+          <button class="mt-2 w-full inline-flex items-center px-4 py-2 rounded-md border border-white/15 hover:bg-white/5" onclick="autoVip()">Marquer VIP (auto)</button>
+          <button class="mt-2 w-full inline-flex items-center px-4 py-2 rounded-md border border-white/15 hover:bg-white/5" onclick="generateAnalyses()">Générer analyses IA</button>
+          <p id="adminMsg" class="text-sm text-white/70 mt-3"></p>
+        </section>
+
+        <section class="rounded-lg border border-white/10 bg-[#121820]/80 p-5 lg:col-span-2">
+          <h2 class="text-lg font-semibold">Nouveau pick</h2>
+          <form class="grid md:grid-cols-2 gap-4 mt-3" onsubmit="event.preventDefault(); createPick();">
+            <div>
+              <label class="text-sm text-white/70">Sport</label>
+              <select id="fSport" class="mt-1 w-full bg-transparent border border-white/15 rounded px-3 py-2 text-sm">
+                <option>football</option><option>basket</option><option>tennis</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-sm text-white/70">Ligue</label>
+              <input id="fLeague" class="mt-1 w-full bg-transparent border border-white/15 rounded px-3 py-2 text-sm" placeholder="Ligue 1" />
+            </div>
+            <div>
+              <label class="text-sm text-white/70">Domicile</label>
+              <input id="fHome" class="mt-1 w-full bg-transparent border border-white/15 rounded px-3 py-2 text-sm" placeholder="PSG" />
+            </div>
+            <div>
+              <label class="text-sm text-white/70">Extérieur</label>
+              <input id="fAway" class="mt-1 w-full bg-transparent border border-white/15 rounded px-3 py-2 text-sm" placeholder="Marseille" />
+            </div>
+            <div>
+              <label class="text-sm text-white/70">Date & heure</label>
+              <input id="fDate" type="datetime-local" class="mt-1 w-full bg-transparent border border-white/15 rounded px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label class="text-sm text-white/70">Marché</label>
+              <input id="fMarket" class="mt-1 w-full bg-transparent border border-white/15 rounded px-3 py-2 text-sm" placeholder="Over/Under, 1X2, BTTS..." />
+            </div>
+            <div>
+              <label class="text-sm text-white/70">Sélection</label>
+              <input id="fSelection" class="mt-1 w-full bg-transparent border border-white/15 rounded px-3 py-2 text-sm" placeholder="Over 2.5" />
+            </div>
+            <div>
+              <label class="text-sm text-white/70">Cote</label>
+              <input id="fOdds" class="mt-1 w-full bg-transparent border border-white/15 rounded px-3 py-2 text-sm" placeholder="1.70" />
+            </div>
+            <div>
+              <label class="text-sm text-white/70">Confiance (%)</label>
+              <input id="fConf" class="mt-1 w-full bg-transparent border border-white/15 rounded px-3 py-2 text-sm" placeholder="80" />
+            </div>
+            <div class="md:col-span-2">
+              <label class="text-sm text-white/70">Justification</label>
+              <textarea id="fRationale" class="mt-1 w-full bg-transparent border border-white/15 rounded px-3 py-2 text-sm" placeholder="Statistiques, contexte..."></textarea>
+            </div>
+            <div class="md:col-span-2">
+              <button class="inline-flex items-center px-4 py-2 rounded-md bg-[#38B6FF] text-black font-semibold hover:opacity-90">Enregistrer</button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </section>
+
   </main>
 
+  <!-- FOOTER -->
+  <footer class="border-t border-white/10 mt-12 py-8 text-center text-sm text-white/60">
+    <p>© 2025 PronosVIP — Contenu informatif, ne garantit aucun gain. Jouez responsable.</p>
+  </footer>
+
+  <!-- SCRIPT (routing + démo de données locales) -->
   <script>
-    const state = { mira:false, sens:false, recuo:false, precisao:false };
+  // --- mini router hash ---
+  const routes = Array.from(document.querySelectorAll('[data-route]'));
+  function showRoute(hash){
+    const route = (hash || '#home').replace('#','');
+    routes.forEach(s => s.classList.add('hidden'));
+    const el = document.getElementById(route) || document.getElementById('home');
+    el.classList.remove('hidden');
+    window.scrollTo({top:0, behavior:'instant'});
+    // bouton compte
+    document.getElementById('accountLink').textContent = isLogged() ? 'Compte' : 'Connexion';
+    document.getElementById('accountLink').href = isLogged() ? '#admin' : '#login';
+  }
+  window.addEventListener('hashchange', ()=>showRoute(location.hash));
+  showRoute(location.hash);
 
-    document.querySelectorAll('.tile').forEach(btn => {
-      btn.addEventListener('click', () => toggle(btn));
-      btn.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(btn); }
-      });
+  // --- données démo ---
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('fr-FR');
+  document.getElementById('vipDate').textContent = dateStr;
+
+  const demoPicks = [
+    {sport:'football', league:'Ligue 1', time:'21:00', home:'PSG', away:'Marseille', market:'Over 2.5', selection:'Over 2.5', odds:1.70, conf:85, rationale:'xG élevés, PSG offensif à domicile, OM ligne haute.'},
+    {sport:'football', league:'Premier League', time:'17:30', home:'Liverpool', away:'Aston Villa', market:'1X2', selection:'1 (Liverpool)', odds:1.65, conf:80, rationale:'Série domicile + pressing efficace (PPDA).'},
+    {sport:'tennis', league:'ATP 500', time:'14:00', home:'Rublev', away:'Dimitrov', market:'Sets', selection:'Over 2.5 sets', odds:2.10, conf:72, rationale:'Match-up serré, styles agressifs, tie-breaks probables.'},
+    {sport:'basket', league:'NBA', time:'02:00', home:'Celtics', away:'Bucks', market:'Totals', selection:'Over 227.5', odds:1.88, conf:74, rationale:'Pace élevé, rating offensif top 5 des deux côtés.'},
+  ];
+
+  // teaser Accueil
+  const teaser = document.getElementById('teaserList');
+  teaser.innerHTML = demoPicks.slice(0,2).map(cardHTML).join('');
+
+  // liste VIP
+  const vip = document.getElementById('vipList');
+  renderVip('all');
+
+  // filtres VIP
+  document.querySelectorAll('[data-filter]').forEach(b=>{
+    b.addEventListener('click', ()=>renderVip(b.dataset.filter));
+  });
+
+  function renderVip(filter){
+    const items = demoPicks.filter(p=>{
+      if(filter==='all') return true;
+      if(['football','basket','tennis'].includes(filter)) return p.sport===filter;
+      if(filter==='70') return p.conf>=70;
+      return true;
     });
+    vip.innerHTML = items.map(cardHTML).join('') || `<p class="text-white/60">Aucun résultat pour ce filtre.</p>`;
+  }
 
-    function toggle(btn){
-      const key = btn.dataset.key;
-      const active = btn.getAttribute('aria-pressed') === 'true';
-      btn.setAttribute('aria-pressed', String(!active));
-      state[key] = !active;
-      console.log('options', state);
-    }
+  function cardHTML(p){
+    return `
+    <article class="rounded-lg border border-white/10 bg-[#121820]/80 p-5">
+      <div class="flex justify-between text-sm text-white/60">
+        <span>${p.league} • ${p.time}</span>
+        <span class="inline-flex items-center px-2.5 py-0.5 text-xs rounded bg-white/10 text-emerald-400">Confiance ${p.conf}%</span>
+      </div>
+      <h3 class="text-lg font-semibold mt-1">${p.home} vs ${p.away}</h3>
+      <p class="text-white/80 mt-2"><b>Marché :</b> ${p.market} • <b>Cote :</b> ${p.odds}</p>
+      <details class="mt-3">
+        <summary class="cursor-pointer text-[#38B6FF]">Analyse détaillée</summary>
+        <div class="text-sm text-white/80 mt-2">${p.rationale}</div>
+      </details>
+    </article>`;
+  }
 
-    document.getElementById('open').addEventListener('click', () => {
-      alert('Options actives : ' + JSON.stringify(state, null, 2));
-    });
+  // historique démo
+  const historyRows = [
+    {d:'24/10/2025', m:'Inter vs Torino', bet:'U2.5', odds:'1.90', res:'Win'},
+    {d:'23/10/2025', m:'PSG vs Rennes', bet:'BTTS', odds:'1.75', res:'Lose'},
+    {d:'22/10/2025', m:'Barça vs Betis', bet:'1 (Barça)', odds:'1.60', res:'Win'},
+  ];
+  const tbody = document.querySelector('#historyTable tbody');
+  tbody.innerHTML = historyRows.map(r=>`
+    <tr class="border-t border-white/10">
+      <td class="py-2 pr-4">${r.d}</td>
+      <td class="py-2 pr-4">${r.m}</td>
+      <td class="py-2 pr-4">${r.bet}</td>
+      <td class="py-2 pr-4">${r.odds}</td>
+      <td class="py-2 pr-4">
+        <span class="text-xs px-2 py-0.5 rounded ${r.res==='Win'?'bg-emerald-600/20 text-emerald-400':'bg-rose-600/20 text-rose-400'}">${r.res}</span>
+      </td>
+    </tr>`).join('');
+
+  // --- faux compte (démo) ---
+  function isLogged(){ return localStorage.getItem('pv_logged')==='1'; }
+  function fakeLogin(){
+    localStorage.setItem('pv_logged','1');
+    document.getElementById('accountLink').textContent='Compte';
+    document.getElementById('accountLink').href='#admin';
+    location.hash='#admin';
+  }
+  function fakeLogout(){
+    localStorage.removeItem('pv_logged');
+    document.getElementById('accountLink').textContent='Connexion';
+    document.getElementById('accountLink').href='#login';
+    location.hash='#home';
+  }
+  // redirige admin si pas connecté
+  if(location.hash==='#admin' && !isLogged()) location.hash='#login';
+
+  // --- actions admin (démo visuelle) ---
+  function setMsg(t){ document.getElementById('adminMsg').textContent=t; }
+  function importMatches(){ setTimeout(()=>{ setMsg('Import terminé : 42 matchs récupérés.'); }, 400); }
+  function autoVip(){ setTimeout(()=>{ setMsg('Auto-VIP : 12 matchs marqués VIP.'); }, 400); }
+  function generateAnalyses(){ setTimeout(()=>{ setMsg('Analyses IA générées pour 12 matchs.'); }, 400); }
+  function createPick(){ setMsg('Pick créé (démo).'); }
+
+  // exposer pour les boutons
+  window.fakeLogin=fakeLogin; window.fakeLogout=fakeLogout;
+  window.importMatches=importMatches; window.autoVip=autoVip; window.generateAnalyses=generateAnalyses; window.createPick=createPick;
   </script>
 </body>
 </html>
