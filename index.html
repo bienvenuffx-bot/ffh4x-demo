@@ -1,200 +1,147 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Painel • Free Fire</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  .card{ @apply bg-[#1A1F28] rounded-2xl p-4 sm:p-5; }
-  .row{ @apply flex items-center justify-between gap-4; }
-  .t{ @apply text-[15px] font-medium text-white; }
-  .s{ @apply text-sm text-white/60 mt-0.5; }
-  .pill{ @apply h-7 w-7 rounded-full border border-white/25 flex items-center justify-center; }
-  .ok{ width:14px;height:14px;border-radius:9999px;background:#34d399;opacity:0;transition:opacity .2s; }
-  .active .pill{ @apply border-emerald-400; }
-  .active .ok{ opacity:1; }
-  .disabled{ opacity:.45; filter:grayscale(.2); pointer-events:none; }
-  .btn-main{ @apply w-full h-12 rounded-full bg-white text-black font-semibold tracking-wide active:scale-[.99] transition; }
-  .switch{ @apply relative inline-flex h-6 w-11 items-center rounded-full bg-white/20 transition; }
-  .switch input{ @apply sr-only; }
-  .knob{ @apply inline-block h-5 w-5 transform rounded-full bg-white transition translate-x-1; }
-  .on .knob{ @apply translate-x-5; }
-  .on{ @apply bg-emerald-500; }
-  .shake{ animation:shake .32s; } @keyframes shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-4px)}40%,60%{transform:translateX(4px)}}
+  body { background: #0B0F13; color: #fff; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+  .panel { max-width: 420px; margin: 18px auto; padding: 12px; }
+  .card { background: #1A1F28; border-radius: 18px; padding: 14px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; box-shadow: 0 6px 18px rgba(0,0,0,0.45); }
+  .card + .card { margin-top: 12px; }
+  .meta { display:block; }
+  .title { font-size:16px; font-weight:600; color: #ffffff; }
+  .desc { font-size:13px; color: rgba(255,255,255,0.65); margin-top:4px; line-height:1.15; }
+  .badge { width:42px; height:42px; border-radius:999px; border: 1.5px solid rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center; }
+  .check { width:18px; height:18px; border-radius:999px; background:#34d399; opacity:0; transform:scale(.9); transition: all .18s ease; }
+  .card[data-active="true"] { background: linear-gradient(180deg, rgba(52,211,153,0.06), rgba(52,211,153,0.02)); border: 1px solid rgba(52,211,153,0.12); }
+  .card[data-active="true"] .check { opacity:1; transform:scale(1); }
+  .card[data-active="false"] { filter: grayscale(.15); opacity:.9; }
+  .big-btn { width:100%; height:56px; border-radius:999px; background:#fff; color:#000; font-weight:700; font-size:15px; margin-top:18px; border: none; box-shadow: 0 6px 18px rgba(0,0,0,0.45); }
+  .hint { font-size:13px; color: rgba(255,255,255,0.55); text-align:center; margin-top:10px; }
 </style>
 </head>
-<body class="min-h-dvh bg-[#0B0F13] text-white flex items-center justify-center p-4">
-
-<!-- ======== Tela de senha ======== -->
-<section id="gate" class="w-full max-w-sm">
-  <div class="text-center mb-4">
-    <h1 class="text-2xl font-semibold">Acesso protegido</h1>
-    <p class="text-xs text-white/60 mt-1">Digite a senha para continuar.</p>
-  </div>
-  <form id="gateForm" class="card space-y-3">
-    <div>
-      <label class="text-sm text-white/70">Senha</label>
-      <input id="pwd" type="password" class="mt-1 w-full bg-transparent border border-white/15 rounded px-3 py-2" placeholder="••••••••" required>
-    </div>
-    <button class="btn-main">Entrar</button>
-    <p id="gateMsg" class="text-center text-xs text-rose-400"></p>
-  </form>
-</section>
-
-<!-- ======== App (após senha) ======== -->
-<main id="app" class="w-full max-w-md hidden">
-  <!-- lista de opções (todas desativadas de início) -->
-  <section id="optList" class="space-y-3">
-    <div class="card opt disabled">
-      <div class="row">
+<body>
+  <main class="panel">
+    <!-- Options list -->
+    <div id="list">
+      <div class="card" data-key="mira" data-active="false" role="button" tabindex="0" aria-pressed="false">
         <div>
-          <div class="t">Melhorar Mira Scope</div>
-          <div class="s">Melhora a mira quando aberta.</div>
+          <span class="title">Melhorar Mira Scope</span>
+          <span class="desc">Melhora a mira quando aberta.</span>
         </div>
-        <div class="row gap-3">
-          <span class="pill"><span class="ok"></span></span>
-          <button class="switch" aria-label="Ativar">
-            <input type="checkbox">
-            <span class="knob"></span>
-          </button>
+        <div class="badge" aria-hidden="true"><span class="check"></span></div>
+      </div>
+
+      <div class="card" data-key="sens" data-active="false" role="button" tabindex="0" aria-pressed="false">
+        <div>
+          <span class="title">Calibrar Sensibilidade</span>
+          <span class="desc">Melhora a sua sensibilidade.</span>
         </div>
+        <div class="badge" aria-hidden="true"><span class="check"></span></div>
+      </div>
+
+      <div class="card" data-key="recuo" data-active="false" role="button" tabindex="0" aria-pressed="false">
+        <div>
+          <span class="title">Diminuir Recuo</span>
+          <span class="desc">Diminui o recuo de qualquer arma.</span>
+        </div>
+        <div class="badge" aria-hidden="true"><span class="check"></span></div>
+      </div>
+
+      <div class="card" data-key="precisao" data-active="false" role="button" tabindex="0" aria-pressed="false">
+        <div>
+          <span class="title">Aumentar Precisão</span>
+          <span class="desc">Aumenta a precisão de qualquer arma.</span>
+        </div>
+        <div class="badge" aria-hidden="true"><span class="check"></span></div>
       </div>
     </div>
 
-    <div class="card opt disabled">
-      <div class="row">
-        <div>
-          <div class="t">Calibrar Sensibilidade</div>
-          <div class="s">Melhora a sua sensibilidade.</div>
-        </div>
-        <div class="row gap-3">
-          <span class="pill"><span class="ok"></span></span>
-          <button class="switch" aria-label="Ativar">
-            <input type="checkbox">
-            <span class="knob"></span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="card opt disabled">
-      <div class="row">
-        <div>
-          <div class="t">Diminuir Recuo</div>
-          <div class="s">Diminui o recuo de qualquer arma.</div>
-        </div>
-        <div class="row gap-3">
-          <span class="pill"><span class="ok"></span></span>
-          <button class="switch" aria-label="Ativar">
-            <input type="checkbox">
-            <span class="knob"></span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="card opt disabled">
-      <div class="row">
-        <div>
-          <div class="t">Aumentar Precisão</div>
-          <div class="s">Aumenta a precisão de qualquer arma.</div>
-        </div>
-        <div class="row gap-3">
-          <span class="pill"><span class="ok"></span></span>
-          <button class="switch" aria-label="Ativar">
-            <input type="checkbox">
-            <span class="knob"></span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- botão inferior -->
-  <div class="mt-5">
-    <button id="openFF" class="btn-main">Abrir Free Fire Normal</button>
-  </div>
-
-  <!-- sair -->
-  <div class="mt-3 text-center">
-    <button id="logout" class="text-xs px-3 py-1 rounded border border-white/15 hover:bg-white/5">Sair</button>
-  </div>
-</main>
+    <!-- Big action button -->
+    <button id="openApp" class="big-btn">Abrir Free Fire Normal</button>
+    <p id="msg" class="hint">Toque numa opção para ativá-la. Em seguida, clique em "Abrir Free Fire".</p>
+  </main>
 
 <script>
-/* ========= Password gate =========
-   Senha: @$Mohamed
-   Hash SHA-256 (hex) para não deixar a senha em claro:
-   1d66d0c24cd99e417757108e19ca0ee72d77f5e56ba9e0cb1cf8331b858cd9dc
+/* Toggle behavior: each card is OFF (data-active="false") initially.
+   When clicked (or Enter/Space), toggle to true — visual change handled by CSS.
 */
-const PASS_HASH="1d66d0c24cd99e417757108e19ca0ee72d77f5e56ba9e0cb1cf8331b858cd9dc";
-const gate=document.getElementById('gate'), app=document.getElementById('app');
-const gateForm=document.getElementById('gateForm'), gateMsg=document.getElementById('gateMsg'), pwd=document.getElementById('pwd');
+(function(){
+  const cards = Array.from(document.querySelectorAll('.card'));
+  const msg = document.getElementById('msg');
 
-function authed(){ return sessionStorage.getItem('auth')==='1'; }
-function showApp(){ gate.classList.add('hidden'); app.classList.remove('hidden'); }
-function showGate(){ app.classList.add('hidden'); gate.classList.remove('hidden'); }
-
-async function sha256Hex(s){ const b=new TextEncoder().encode(s); const h=await crypto.subtle.digest('SHA-256',b); return [...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
-
-if(authed()) showApp();
-gateForm.addEventListener('submit', async (e)=>{
-  e.preventDefault(); gateMsg.textContent='';
-  const ok=(await sha256Hex(pwd.value))===PASS_HASH;
-  if(ok){ sessionStorage.setItem('auth','1'); pwd.value=''; showApp(); }
-  else { gateMsg.textContent='Senha incorreta.'; gateForm.classList.remove('shake'); void gateForm.offsetWidth; gateForm.classList.add('shake'); }
-});
-document.getElementById('logout').addEventListener('click', ()=>{ sessionStorage.removeItem('auth'); showGate(); });
-
-/* ========= Lógica das opções =========
-   Todas começam desativadas (classe .disabled).
-   Ao tocar no switch, ativa/desativa a própria opção e mostra a bolinha verde.
-*/
-document.querySelectorAll('.opt').forEach(opt=>{
-  const btn=opt.querySelector('.switch');
-  btn.addEventListener('click', (e)=>{
-    e.preventDefault();
-    const isOn=btn.classList.toggle('on');
-    opt.classList.toggle('disabled', !isOn);
-    opt.classList.toggle('active', isOn);
-    const input=btn.querySelector('input'); if(input) input.checked=isOn;
-  });
-});
-
-/* ========= Abrir o Free Fire =========
-   Android (Chrome): usa intent:// com o pacote oficial. Fallback Play Store.
-   iOS: tenta esquema (se existir), depois App Store. Desktop: abre Play Store web.
-*/
-function openFreeFire(){
-  const ua=navigator.userAgent||navigator.vendor||window.opera;
-  const play='https://play.google.com/store/apps/details?id=com.dts.freefireth';
-  const appstore='https://apps.apple.com/app/id1300146617'; // Free Fire (iOS)
-  const isAndroid=/Android/i.test(ua);
-  const isIOS=/iPhone|iPad|iPod/i.test(ua);
-
-  if(isAndroid){
-    // Tenta abrir o app via intent (Chrome/Android)
-    const intent='intent://open/#Intent;package=com.dts.freefireth;end';
-    // Navega para o intent; se falhar, depois de 1.2s cai no Play Store
-    let jumped=false;
-    const t=setTimeout(()=>{ if(!jumped) window.location.href=play; },1200);
-    window.location.href=intent;
-    setTimeout(()=>{ jumped=true; clearTimeout(t); },50);
-  }else if(isIOS){
-    // iOS: tenta esquema (se suportado) e depois App Store
-    const scheme='freefire://';
-    let jumped=false;
-    const t=setTimeout(()=>{ if(!jumped) window.location.href=appstore; },1200);
-    // iframe “stealth” evita bloqueio em alguns navegadores
-    const ifr=document.createElement('iframe'); ifr.style.display='none'; ifr.src=scheme; document.body.appendChild(ifr);
-    setTimeout(()=>{ jumped=true; document.body.removeChild(ifr); },50);
-  }else{
-    // Desktop: manda para a listagem do Play Store
-    window.open(play,'_blank');
+  function toggleCard(card){
+    const isActive = card.getAttribute('data-active') === 'true';
+    card.setAttribute('data-active', isActive ? 'false' : 'true');
+    card.setAttribute('aria-pressed', (!isActive).toString());
   }
-}
-document.getElementById('openFF').addEventListener('click', openFreeFire);
+
+  // Click + keyboard handlers
+  cards.forEach(c=>{
+    c.addEventListener('click', ()=> toggleCard(c));
+    c.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCard(c); }
+    });
+  });
+
+  // Open Free Fire button logic (Android/iOS fallback)
+  const openBtn = document.getElementById('openApp');
+  function isAndroid(){ return /Android/i.test(navigator.userAgent); }
+  function isIOS(){ return /iPhone|iPad|iPod/i.test(navigator.userAgent); }
+
+  const PLAY_URL = 'https://play.google.com/store/apps/details?id=com.dts.freefireth';
+  const PLAY_URL_MAX = 'https://play.google.com/store/apps/details?id=com.dts.freefiremax';
+  const IOS_URL = 'https://apps.apple.com/app/id1300146617';
+
+  // Android: try intent then fallback Play Store
+  function openAndroid() {
+    // Try main package then MAX. If neither works, redirect to Play Store.
+    const packages = ['com.dts.freefireth','com.dts.freefiremax'];
+    // Attempt an intent for the first package (Chrome supports intent)
+    const intent = `intent://open/#Intent;package=${packages[0]};end`;
+    // If browser doesn't handle intent, fallback to Play Store after timeout
+    let tried = false;
+    const t = setTimeout(()=>{ if(!tried) window.location.href = PLAY_URL; }, 1200);
+    window.location.href = intent;
+    setTimeout(()=>{ tried = true; clearTimeout(t); }, 80);
+  }
+
+  // iOS: try scheme then App Store
+  function openIOS() {
+    const schemes = ['freefire://', 'garena://freefire'];
+    let fired = false;
+    const t = setTimeout(()=>{ if(!fired) window.location.href = IOS_URL; }, 1200);
+    // Try each scheme with an iframe (stealth)
+    (async ()=> {
+      for(const s of schemes){
+        const ifr = document.createElement('iframe');
+        ifr.style.display='none';
+        ifr.src = s;
+        document.body.appendChild(ifr);
+        await new Promise(r=>setTimeout(r, 150));
+        try { document.body.removeChild(ifr); } catch(e){}
+      }
+      fired = true; clearTimeout(t);
+    })();
+  }
+
+  // Generic click handler
+  openBtn.addEventListener('click', ()=>{
+    msg.textContent = 'Tentando abrir o app...';
+    if(isAndroid()){
+      openAndroid();
+    } else if(isIOS()){
+      openIOS();
+    } else {
+      // Desktop: open Play Store web
+      window.open(PLAY_URL, '_blank');
+      msg.textContent = 'Abrindo a página do Play Store no navegador.';
+    }
+  });
+
+})();
 </script>
 </body>
 </html>
