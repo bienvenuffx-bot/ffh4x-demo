@@ -1,143 +1,214 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PronosVIP — Matchs du jour</title>
-<meta name="description" content="Pronostics VIP quotidiens basés sur les données.">
-<link rel="icon" href="data:,">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panneau d’options (protégé)</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .card{ @apply bg-[#1A1F28] rounded-2xl px-5 py-4; }
+  .row{ @apply flex items-center justify-between gap-4; }
+  .hint{ @apply text-xs text-white/50; }
+  .title{ @apply text-[15px] font-medium text-white; }
+  .subtitle{ @apply text-sm text-white/60 mt-0.5; }
+  .disabled{ opacity:.4; pointer-events:none; filter:grayscale(25%); }
+  .check{ @apply h-5 w-5 rounded-full border border-white/20 flex items-center justify-center; }
+  .check:after{ content:""; @apply h-2.5 w-2.5 rounded-full bg-emerald-400 opacity-0 transition; }
+  .active .check{ @apply border-emerald-400; }
+  .active .check:after{ opacity:1; }
+  .switch{ @apply relative inline-flex h-6 w-11 items-center rounded-full transition; }
+  .switch input{ @apply sr-only; }
+  .knob{ @apply inline-block h-5 w-5 transform rounded-full bg-white transition; }
+  .shake{ animation:shake .35s ease-in-out; }
+  @keyframes shake{ 10%,90%{transform:translateX(-1px)} 20%,80%{transform:translateX(2px)} 30%,50%,70%{transform:translateX(-4px)} 40%,60%{transform:translateX(4px)} }
+</style>
 </head>
-<body class="bg-[#0B0F13] text-[#E6EDF3]">
-  <header class="border-b border-white/10 bg-[#0B0F13]/90 sticky top-0 z-50 backdrop-blur">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-      <a href="#home" class="text-xl font-bold text-[#38B6FF]">PronosVIP</a>
-      <nav class="flex items-center gap-5 text-sm">
-        <a class="hover:text-[#38B6FF]" href="#home">Accueil</a>
-        <a class="hover:text-[#38B6FF]" href="#vip">VIP</a>
-        <a class="hover:text-[#38B6FF]" href="#historique">Historique</a>
-        <a class="hover:text-[#38B6FF]" href="#abonnement">Abonnement</a>
-      </nav>
+<body class="min-h-dvh bg-[#0B0F13] text-white flex items-center justify-center p-4">
+
+<!-- Écran MOT DE PASSE -->
+<section id="gate" class="w-full max-w-sm">
+  <div class="text-center mb-5">
+    <h1 class="text-2xl font-semibold">Accès protégé</h1>
+    <p class="hint mt-1">Entre le mot de passe pour continuer.</p>
+  </div>
+  <form id="gateForm" class="card space-y-3">
+    <div>
+      <label class="text-sm text-white/70">Mot de passe</label>
+      <input id="pwd" type="password" class="mt-1 w-full bg-transparent border border-white/15 rounded px-3 py-2" placeholder="••••••••" required>
     </div>
-  </header>
+    <button class="w-full h-10 rounded-md bg-[#38B6FF] text-black font-semibold hover:opacity-90">Entrer</button>
+    <p id="gateMsg" class="hint text-center"></p>
+  </form>
+</section>
 
-  <main class="max-w-6xl mx-auto px-4">
-    <!-- HOME -->
-    <section id="home" data-route class="py-10">
-      <h1 class="text-3xl sm:text-5xl font-semibold tracking-tight text-center">
-        Pronostics VIP quotidiens, prêts à jouer
-      </h1>
-      <p class="mt-4 text-white/70 max-w-2xl mx-auto text-center">
-        Les matchs du <span id="dateLabel"></span> sont chargés en direct depuis notre API.
-      </p>
+<!-- APP (cachée tant que non connecté) -->
+<main id="app" class="w-full max-w-md hidden">
+  <!-- barre top -->
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-semibold">Panneau d’options</h1>
+    <button id="logout" class="text-xs px-3 py-1 rounded border border-white/15 hover:bg-white/5">Se déconnecter</button>
+  </div>
 
-      <section class="mt-10">
-        <div class="flex items-center justify-between flex-wrap gap-3">
-          <h2 class="text-2xl font-semibold">Matchs du jour (Football)</h2>
-          <div class="text-sm text-white/60">Fuseau : Africa/Libreville</div>
+  <p class="hint mb-4">Tout est désactivé tant que le switch général n’est pas actif.</p>
+
+  <!-- Switch général -->
+  <div class="card mb-4">
+    <div class="row">
+      <div>
+        <div class="title">Activer les options</div>
+        <div class="subtitle">Permet d’activer/désactiver les réglages ci-dessous.</div>
+      </div>
+      <label class="switch bg-white/20 data-[on=true]:bg-emerald-500 cursor-pointer" id="masterSwitch">
+        <input type="checkbox" id="master">
+        <span class="knob translate-x-1 data-[on=true]:translate-x-5"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Options (désactivées par défaut) -->
+  <section id="optionsBlock" class="space-y-3 disabled">
+    <!-- Option 1 -->
+    <div class="card option" data-key="scope">
+      <div class="row">
+        <div>
+          <div class="title">Améliorer Mira Scope</div>
+          <div class="subtitle">Améliore la visée quand la mire est ouverte.</div>
         </div>
-
-        <div id="fixturesWrap" class="grid md:grid-cols-2 gap-4 mt-5">
-          <!-- Cartes injectées -->
+        <div class="row gap-3">
+          <span class="check" aria-hidden="true"></span>
+          <label class="switch bg-white/20 data-[on=true]:bg-emerald-500 cursor-pointer">
+            <input type="checkbox" class="opt-toggle">
+            <span class="knob translate-x-1 data-[on=true]:translate-x-5"></span>
+          </label>
         </div>
+      </div>
+    </div>
+    <!-- Option 2 -->
+    <div class="card option" data-key="sens">
+      <div class="row">
+        <div>
+          <div class="title">Calibrer Sensibilité</div>
+          <div class="subtitle">Ajuste finement la sensibilité.</div>
+        </div>
+        <div class="row gap-3">
+          <span class="check" aria-hidden="true"></span>
+          <label class="switch bg-white/20 data-[on=true]:bg-emerald-500 cursor-pointer">
+            <input type="checkbox" class="opt-toggle">
+            <span class="knob translate-x-1 data-[on=true]:translate-x-5"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <!-- Option 3 -->
+    <div class="card option" data-key="recoil">
+      <div class="row">
+        <div>
+          <div class="title">Diminuer Recul</div>
+          <div class="subtitle">Réduit le recul sur n’importe quelle arme.</div>
+        </div>
+        <div class="row gap-3">
+          <span class="check" aria-hidden="true"></span>
+          <label class="switch bg-white/20 data-[on=true]:bg-emerald-500 cursor-pointer">
+            <input type="checkbox" class="opt-toggle">
+            <span class="knob translate-x-1 data-[on=true]:translate-x-5"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <!-- Option 4 -->
+    <div class="card option" data-key="accuracy">
+      <div class="row">
+        <div>
+          <div class="title">Augmenter Précision</div>
+          <div class="subtitle">Améliore la précision globale.</div>
+        </div>
+        <div class="row gap-3">
+          <span class="check" aria-hidden="true"></span>
+          <label class="switch bg-white/20 data-[on=true]:bg-emerald-500 cursor-pointer">
+            <input type="checkbox" class="opt-toggle">
+            <span class="knob translate-x-1 data-[on=true]:translate-x-5"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <div id="loading" class="text-white/60 mt-6">Chargement des matchs en temps réel…</div>
-        <div id="empty" class="hidden text-white/60 mt-6">Aucun match trouvé pour aujourd’hui.</div>
-        <div id="error" class="hidden text-rose-400 mt-6">Erreur de chargement. Vérifie la fonction <code>/api/fixtures</code> et la clé d’API.</div>
-      </section>
-
-      <section class="mt-12">
-        <h3 class="text-xl font-semibold mb-2">Comment ça marche ?</h3>
-        <ul class="list-disc list-inside text-white/80 space-y-1">
-          <li>Le navigateur appelle <code>/api/fixtures</code> (fonction serverless Vercel).</li>
-          <li>La fonction interroge <b>API-SPORTS</b> avec ta clé (cachée côté serveur).</li>
-          <li>Les résultats (matchs réels du jour) s’affichent ci-dessus.</li>
-        </ul>
-      </section>
-    </section>
-
-    <!-- Sections décoratives (maquette) -->
-    <section id="vip" data-route class="py-10 hidden">
-      <h2 class="text-2xl font-semibold">Espace VIP</h2>
-      <p class="text-white/70 mt-2">Connecte ton backend (picks, cotes, analyses IA) pour alimenter cette section.</p>
-    </section>
-
-    <section id="historique" data-route class="py-10 hidden">
-      <h2 class="text-2xl font-semibold">Historique</h2>
-      <p class="text-white/70 mt-2">À brancher à ta base (ex: Supabase) pour lister les résultats passés.</p>
-    </section>
-
-    <section id="abonnement" data-route class="py-10 hidden">
-      <h2 class="text-2xl font-semibold">Abonnement</h2>
-      <p class="text-white/70 mt-2">Intègre Stripe pour vendre l’accès VIP.</p>
-    </section>
-  </main>
-
-  <footer class="border-t border-white/10 mt-12 py-8 text-center text-sm text-white/60">
-    © 2025 PronosVIP — Contenu informatif, ne garantit aucun gain. Jouez responsable.
-  </footer>
+  <!-- Bouton bas -->
+  <div class="mt-5">
+    <button class="w-full h-12 rounded-full bg-white text-black font-semibold active:scale-[.99] transition">
+      Ouvrir l’app normalement
+    </button>
+    <p class="hint text-center mt-2">Maquette UI — aucune action réelle n’est appliquée.</p>
+  </div>
+</main>
 
 <script>
-/* --- mini-router hash --- */
-const routes = Array.from(document.querySelectorAll('[data-route]'));
-function showRoute(hash){
-  const id = (hash || '#home').replace('#','');
-  routes.forEach(s => s.classList.add('hidden'));
-  (document.getElementById(id) || document.getElementById('home')).classList.remove('hidden');
-  window.scrollTo({top:0, behavior:'instant'});
-}
-window.addEventListener('hashchange', ()=>showRoute(location.hash));
-showRoute(location.hash);
+/* ========= Password gate =========
+   Mot de passe attendu: @$Mohamed
+   Comparaison via SHA-256 (hex) pour éviter le clair dans le code.
+   Hash attendu: 1d66d0c24cd99e417757108e19ca0ee72d77f5e56ba9e0cb1cf8331b858cd9dc
+*/
+const PASS_HASH = "1d66d0c24cd99e417757108e19ca0ee72d77f5e56ba9e0cb1cf8331b858cd9dc";
+const gate = document.getElementById('gate');
+const app  = document.getElementById('app');
+const gateForm = document.getElementById('gateForm');
+const gateMsg = document.getElementById('gateMsg');
+const pwdInput = document.getElementById('pwd');
 
-/* --- date (Africa/Libreville) --- */
-const tz = 'Africa/Libreville';
-const now = new Date();
-document.getElementById('dateLabel').textContent =
-  new Intl.DateTimeFormat('fr-FR', { dateStyle: 'full', timeZone: tz }).format(now);
+function isAuthed(){ return sessionStorage.getItem('pv_authed')==='1'; }
+function showApp(){ gate.classList.add('hidden'); app.classList.remove('hidden'); }
+function showGate(){ app.classList.add('hidden'); gate.classList.remove('hidden'); }
 
-/* --- render cartes --- */
-function card(fx){
-  const dt = new Date(fx.date_local);
-  const dStr = new Intl.DateTimeFormat('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', timeZone: tz }).format(dt);
-  const tStr = new Intl.DateTimeFormat('fr-FR', { hour:'2-digit', minute:'2-digit', hour12:false, timeZone: tz }).format(dt);
-  return `
-  <article class="rounded-lg border border-white/10 bg-[#121820]/80 p-5">
-    <div class="text-sm text-white/60 flex justify-between">
-      <span>${fx.league}</span>
-      <span>${dStr} • ${tStr}</span>
-    </div>
-    <h3 class="text-lg font-semibold mt-1">${fx.home} vs ${fx.away}</h3>
-    <p class="text-white/70 text-sm mt-2">ID fixture: ${fx.id}</p>
-  </article>`;
+async function sha256Hex(str){
+  const enc = new TextEncoder().encode(str);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-/* --- fetch real fixtures from our serverless function --- */
-async function loadFixtures(){
-  const loading = document.getElementById('loading');
-  const empty = document.getElementById('empty');
-  const error = document.getElementById('error');
-  const wrap = document.getElementById('fixturesWrap');
+if(isAuthed()) showApp();
 
-  loading.classList.remove('hidden');
-  empty.classList.add('hidden'); error.classList.add('hidden'); wrap.innerHTML = '';
-
-  // On demande les matchs pour la date locale africa/Libreville (la fonction s’en charge aussi côté serveur)
-  const dateParam = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(now); // YYYY-MM-DD
-  try {
-    const res = await fetch(`/api/fixtures?date=${dateParam}&sport=football`);
-    if(!res.ok) throw new Error(await res.text());
-    const json = await res.json();
-    const items = json.fixtures || [];
-    if(items.length === 0){ empty.classList.remove('hidden'); return; }
-    wrap.innerHTML = items.map(card).join('');
-  } catch(e){
-    console.error(e);
-    error.classList.remove('hidden');
-  } finally {
-    loading.classList.add('hidden');
+gateForm.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  gateMsg.textContent='';
+  const h = await sha256Hex(pwdInput.value);
+  if(h === PASS_HASH){
+    sessionStorage.setItem('pv_authed','1');
+    pwdInput.value='';
+    showApp();
+  }else{
+    gateMsg.textContent = 'Mot de passe incorrect.';
+    gateForm.classList.remove('shake'); void gateForm.offsetWidth; gateForm.classList.add('shake');
   }
-}
-loadFixtures();
+});
+
+document.getElementById('logout').addEventListener('click', ()=>{
+  sessionStorage.removeItem('pv_authed');
+  showGate();
+});
+
+/* ========= Options UI ========= */
+function setSwitch(el,on){ el.dataset.on = on ? 'true' : 'false'; }
+const masterInput = document.getElementById('master');
+const masterSwitch = document.getElementById('masterSwitch');
+const optionsBlock = document.getElementById('optionsBlock');
+
+masterInput.addEventListener('change', ()=>{
+  const on = masterInput.checked;
+  setSwitch(masterSwitch, on);
+  optionsBlock.classList.toggle('disabled', !on);
+});
+
+document.querySelectorAll('.option').forEach(opt=>{
+  const toggle = opt.querySelector('.opt-toggle');
+  const sw = opt.querySelector('.switch');
+  const check = opt.querySelector('.check');
+  const card = opt;
+  toggle.addEventListener('change', ()=>{
+    const on = toggle.checked;
+    setSwitch(sw,on);
+    card.classList.toggle('active', on);
+  });
+});
 </script>
 </body>
 </html>
