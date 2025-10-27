@@ -1,230 +1,137 @@
 <!doctype html>
-<html lang="pt">
+<html lang="fr">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>mhd — Painel (interativo)</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>Auxílio @ Mohamed.ofc</title>
 <style>
-  :root{--bg:#08090b;--card:#14171b;--accent:#E6EDF3;--pill:rgba(255,255,255,.12);--active:rgba(52,211,153,.12)}
-  html,body{height:100%}body{margin:0;background:var(--bg);color:var(--accent);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
-  #bg{position:fixed;inset:0;z-index:0}
-  .wrap{position:relative;z-index:5;max-width:440px;margin:18px auto;padding:14px}
-  .panel{background:rgba(20,23,27,.92);border-radius:14px;padding:14px;box-shadow:0 12px 36px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.03)}
-  .title{font-weight:700;font-size:18px;text-align:center;letter-spacing:1px}
-  .tabs{display:flex;gap:8px;margin-top:12px;border-radius:10px;overflow:hidden;background:rgba(255,255,255,.02)}
-  .tab{flex:1;padding:10px 12px;text-align:center;font-weight:600;color:rgba(255,255,255,.65);cursor:pointer}
-  .tab.active{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));color:var(--accent)}
-  [data-pane]{display:none}.show{display:block}
-
-  .option{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px;border-radius:12px;margin-top:12px;background:rgba(255,255,255,.01);border:1px solid rgba(255,255,255,.03);transition:all .18s}
-  .option .left{max-width:78%}.opt-title{font-weight:600}.opt-desc{font-size:13px;color:rgba(255,255,255,.65);margin-top:6px}
-  .badge{width:36px;height:36px;border-radius:999px;border:1.5px solid var(--pill);display:flex;align-items:center;justify-content:center}
-  .dot{width:14px;height:14px;border-radius:999px;background:#34d399;opacity:0;transform:scale(.9);transition:all .15s}
-  .option[data-active="true"]{background:linear-gradient(180deg,rgba(52,211,153,.05),rgba(52,211,153,.02));border-color:var(--active)}
-  .option[data-active="true"] .dot{opacity:1;transform:scale(1)}
-  .sep{height:1px;background:rgba(255,255,255,.05);margin:14px 0;border-radius:2px}
-  .row{display:flex;align-items:center;gap:12px}
-  input[type="range"]{width:100%}
-  .small{font-size:13px;color:rgba(255,255,255,.7)}
-  .select{width:100%;padding:10px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);color:var(--accent)}
-  .radios{display:flex;gap:12px;margin-top:8px}
-  .radio{padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.06);cursor:pointer;color:rgba(255,255,255,.8)}
-  .radio[aria-checked="true"]{border-color:var(--active);background:linear-gradient(180deg,rgba(52,211,153,.05),rgba(52,211,153,.02));color:var(--accent)}
-  .btn{display:block;margin-top:16px;padding:14px;border-radius:12px;background:#fff;color:#000;font-weight:800;text-align:center;letter-spacing:.6px;box-shadow:0 10px 28px rgba(0,0,0,.5)}
-  .foot{font-size:13px;color:rgba(255,255,255,.6);text-align:center;margin-top:12px}
-  /* Snackbar */
-  .snack{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(120%);background:#111827;color:#e5e7eb;border:1px solid rgba(255,255,255,.08);padding:10px 14px;border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.6);z-index:50;opacity:0;transition:transform .2s, opacity .2s}
-  .snack.show{transform:translateX(-50%) translateY(0);opacity:1}
+  :root{
+    --bg:#000; --panel:#101223; --stroke:#2b2f7a;
+    --text:#e9ecff; --muted:#a9b0d6; --accent:#3b54ff; --accent2:#5e6bff;
+  }
+  *{box-sizing:border-box} 
+  body{
+    margin:0;background:#000;color:var(--text);
+    font:500 16px/1.35 system-ui,Segoe UI,Roboto,Arial;
+    display:grid;place-items:center;min-height:100vh;
+  }
+  .card{
+    width:min(92vw,420px);
+    background:linear-gradient(#0e1022,#0e0f1a);
+    border:2px solid var(--stroke);
+    border-radius:18px;
+    padding:22px 18px 18px;
+    box-shadow:0 0 0 3px rgba(59,84,255,.25) inset,0 0 40px rgba(59,84,255,.15);
+  }
+  .title{font-weight:800;text-align:center;font-size:28px;margin:0 0 14px}
+  .divider{height:4px;background:var(--accent);border-radius:4px;opacity:.9;margin:6px 0 16px}
+  .tabs{display:flex;gap:12px;justify-content:center;margin-bottom:14px}
+  .tab{padding:10px 22px;border-radius:12px;border:0;cursor:pointer;color:#cbd1ff;background:#1a1d3d;font-weight:700}
+  .tab[aria-selected="true"]{background:var(--accent);color:#fff;box-shadow:0 6px 18px rgba(59,84,255,.35)}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:8px 6px}
+  .section{height:2px;background:#23265a;border-radius:2px;margin:8px 0 12px}
+  .muted{color:var(--muted)}
+  /* checkboxes OFF par défaut */
+  .check{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;color:var(--muted)}
+  .check input{appearance:none;width:22px;height:22px;border-radius:6px;border:2px solid #2d2f59;background:#0b0d1d;display:grid;place-content:center;transition:.18s}
+  .check input::after{content:"";width:12px;height:12px;border-radius:3px;background:transparent;transition:.18s;transform:scale(.8)}
+  .check.active{color:var(--text)}
+  .check input:checked{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(59,84,255,.2)}
+  .check input:checked::after{background:var(--accent)}
+  /* slider */
+  .fov{display:flex;align-items:center;gap:14px}
+  input[type="range"]{appearance:none;width:100%;height:4px;background:#2a2f6d;border-radius:999px}
+  input[type="range"]::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:0 0 0 4px rgba(59,84,255,.25)}
+  .dot{width:14px;height:14px;border-radius:50%;background:#39d39a;box-shadow:0 0 10px rgba(57,211,154,.6)}
+  .fov-val{min-width:54px;text-align:right;font-weight:800}
+  .subtle{font-weight:700;text-align:center;margin:4px 0 6px}
+  .hitbox{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .cta{margin-top:16px;width:100%;padding:14px 16px;border:0;border-radius:14px;background:var(--accent);color:#fff;font-weight:800;cursor:pointer}
 </style>
 </head>
 <body>
-
-<canvas id="bg"></canvas>
-
-<div class="wrap">
-  <div class="panel">
-    <div class="title">mhd</div>
+  <main class="card" id="app">
+    <h1 class="title">Auxílio @ Mohamed.ofc</h1>
+    <div class="divider"></div>
 
     <div class="tabs" role="tablist">
-      <div class="tab active" data-tab="aim">Aimbot</div>
-      <div class="tab" data-tab="info">Info</div>
+      <button class="tab" id="tab-aux" role="tab" aria-selected="true">Auxilio</button>
+      <button class="tab" id="tab-info" role="tab" aria-selected="false">Info</button>
     </div>
 
-    <!-- PANE AIMBOT -->
-    <section id="pane-aim" data-pane class="show">
-      <div class="option" data-key="auxilio" data-active="false" role="button" tabindex="0">
-        <div class="left">
-          <div class="opt-title">Ativar Auxílio</div>
-          <div class="opt-desc">Ativa funções de auxílio.</div>
-        </div>
-        <div class="badge"><span class="dot"></span></div>
-      </div>
-
-      <div class="option" data-key="precisao" data-active="false" role="button" tabindex="0">
-        <div class="left">
-          <div class="opt-title">Ativar Precisão</div>
-          <div class="opt-desc">Melhora a precisão automática.</div>
-        </div>
-        <div class="badge"><span class="dot"></span></div>
-      </div>
-
-      <div class="sep"></div>
-
+    <section id="panel-aux">
       <div class="row">
-        <div class="small">Precisão</div>
-        <div id="precVal" style="min-width:36px;text-align:right">0</div>
+        <label class="check"><input type="checkbox" id="headtrick">Injectar headtrick</label>
+        <label class="check"><input type="checkbox" id="fovava">fov ava</label>
       </div>
-      <input id="precRange" type="range" min="0" max="100" value="0" />
-
-      <div style="margin-top:12px">
-        <select id="target" class="select">
-          <option>Auxilio Head</option><option>Auxilio Body</option><option>Auxilio Chest</option>
-        </select>
+      <div class="row">
+        <label class="check"><input type="checkbox" id="norecoil">injectar no recoil</label>
+        <label class="check"><input type="checkbox" id="nofps">no fps limit</label>
+      </div>
+      <div class="row">
+        <label class="check"><input type="checkbox" id="aimbot">aimbot disfarçado</label>
       </div>
 
-      <div class="sep"></div>
+      <div class="section"></div>
 
-      <div class="small" style="text-align:center">Tipo de Aimbot:</div>
-      <div class="radios">
-        <div class="radio" role="radio" aria-checked="false" data-name="tipo" data-value="atirar" tabindex="0">Ao Atirar</div>
-        <div class="radio" role="radio" aria-checked="false" data-name="tipo" data-value="olhar" tabindex="0">Ao Olhar</div>
+      <div class="row fov">
+        <span class="dot"></span>
+        <input type="range" id="fov" min="0" max="10" step="1" value="0">
+        <span class="fov-val">Fov <span id="fovOut">0</span></span>
       </div>
+
+      <div class="section"></div>
+
+      <div class="subtle">Hit box</div>
+      <div class="hitbox">
+        <label class="check"><input type="checkbox" id="cabeca">cabeça</label>
+        <label class="check"><input type="checkbox" id="pescoco">pescoço</label>
+      </div>
+
+      <!-- Bouton injectar qui ouvre Free Fire -->
+      <button class="cta" id="openFF">INJETAR FUNÇÕES NO JOGO</button>
     </section>
 
-    <!-- PANE INFO -->
-    <section id="pane-info" data-pane>
-      <div class="option" data-active="true" style="cursor:default">
-        <div class="left">
-          <div class="opt-title">Nome do Criador</div>
-          <div class="opt-desc">Mohamed iOS</div>
-        </div>
-        <div class="badge"><span class="dot" style="opacity:1;transform:scale(1)"></span></div>
-      </div>
-
-      <div class="option" data-active="true" style="cursor:default">
-        <div class="left">
-          <div class="opt-title">Cellular</div>
-          <div class="opt-desc">iPhone 12</div>
-        </div>
-        <div class="badge"><span class="dot" style="opacity:1;transform:scale(1)"></span></div>
-      </div>
-
-      <div class="sep"></div>
-
-      <div class="row">
-        <div class="small">FOV</div>
-        <div id="fovVal" style="min-width:36px;text-align:right">0</div>
-      </div>
-      <input id="fovRange" type="range" min="0" max="10" value="0" step="1" />
+    <section id="panel-info" hidden>
+      <p class="muted">Infos générales. (Ici tu peux mettre un texte d’aide.)</p>
     </section>
-  </div>
-
-  <button id="inject" class="btn">INJETAR FUNÇÕES NO JOGO</button>
-  <div class="foot">Maquette UI — nenhuma função real é injetada.</div>
-</div>
-
-<!-- Snackbar -->
-<div id="snack" class="snack"></div>
+  </main>
 
 <script>
-/* ===== BG: lignes reliées (léger) ===== */
-(function(){
-  const c=document.getElementById('bg'),x=c.getContext('2d',{alpha:true});
-  let W=innerWidth,H=innerHeight,D=window.devicePixelRatio||1;
-  function res(){W=innerWidth;H=innerHeight;D=window.devicePixelRatio||1;c.width=W*D;c.height=H*D;c.style.width=W+'px';c.style.height=H+'px';x.setTransform(D,0,0,D,0,0);}
-  res(); addEventListener('resize',res);
-  const N=Math.max(12,Math.floor((W*H)/12000)),R=Math.min(220,Math.max(80,Math.min(W,H)/6));
-  const P=[];const rnd=(a,b)=>Math.random()*(b-a)+a;
-  for(let i=0;i<N;i++)P.push({x:rnd(0,W),y:rnd(0,H),vx:rnd(-.25,.25),vy:rnd(-.25,.25),r:rnd(1.6,3.2),ph:Math.random()*6.28});
-  const ptr={x:W/2,y:H/2};P.push(ptr);
-  let last=performance.now();
-  function loop(t){const dt=(t-last)*.001;last=t;
-    for(let i=0;i<P.length-1;i++){const n=P[i];n.x+=n.vx*(1+Math.sin(n.ph)*.6)*16*dt;n.y+=n.vy*(1+Math.cos(n.ph)*.6)*16*dt;n.ph+=dt*.6;
-      if(n.x<-10||n.x>W+10)n.vx*=-1;if(n.y<-10||n.y>H+10)n.vy*=-1;}
-    x.clearRect(0,0,W,H);
-    const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,'rgba(10,12,15,.35)');g.addColorStop(1,'rgba(2,4,6,.35)');x.fillStyle=g;x.fillRect(0,0,W,H);
-    for(let i=0;i<P.length;i++){for(let j=i+1;j<P.length;j++){const a=P[i],b=P[j],dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy;if(d2<=R*R){const d=Math.sqrt(d2),al=.18*(1-d/R);x.beginPath();x.strokeStyle=`rgba(120,140,200,${al})`;x.lineWidth=.9;x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke();}}}
-    for(const n of P){if(n===ptr)continue;x.beginPath();x.fillStyle='rgba(200,210,255,.06)';x.arc(n.x,n.y,n.r+.8,0,6.28);x.fill();x.beginPath();x.fillStyle='rgba(200,210,255,.12)';x.arc(n.x,n.y,n.r*.6,0,6.28);x.fill();}
-    x.beginPath();x.fillStyle='rgba(180,200,255,.14)';x.arc(ptr.x,ptr.y,3.2,0,6.28);x.fill();
-    requestAnimationFrame(loop);}
-  requestAnimationFrame(loop);
-  addEventListener('mousemove',e=>{ptr.x=e.clientX;ptr.y=e.clientY});
-  addEventListener('touchmove',e=>{if(e.touches[0]){ptr.x=e.touches[0].clientX;ptr.y=e.touches[0].clientY}}, {passive:true});
-})();
-
-/* ===== UI interactive ===== */
-(function(){
-  const snack = document.getElementById('snack');
-  function toast(t){snack.textContent=t;snack.classList.add('show');setTimeout(()=>snack.classList.remove('show'),1200);}
-
-  // Tabs
-  const tabs=document.querySelectorAll('.tab');
-  const panes={aim:document.getElementById('pane-aim'),info:document.getElementById('pane-info')};
-  tabs.forEach(t=>t.addEventListener('click',()=>{
-    tabs.forEach(x=>x.classList.remove('active')); t.classList.add('active');
-    Object.values(panes).forEach(p=>p.classList.remove('show'));
-    panes[t.dataset.tab].classList.add('show');
-  }));
-
-  // Options toggle
-  document.querySelectorAll('.option[role="button"]').forEach(opt=>{
-    opt.addEventListener('click',()=>{
-      const on = opt.getAttribute('data-active')==='true';
-      opt.setAttribute('data-active', (!on).toString());
-      toast((!on?'Ativado: ':'Desativado: ') + opt.querySelector('.opt-title').textContent.trim());
-    });
-    opt.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();opt.click();} });
+  // Gestion des cases
+  document.querySelectorAll('.check input').forEach(cb=>{
+    const label = cb.closest('.check');
+    const sync = ()=> label.classList.toggle('active', cb.checked);
+    cb.addEventListener('change', sync);
+    sync();
   });
 
-  // Sliders display
-  const precRange=document.getElementById('precRange'), precVal=document.getElementById('precVal');
-  precRange.addEventListener('input',()=>{precVal.textContent=precRange.value;});
-  const fovRange=document.getElementById('fovRange'), fovVal=document.getElementById('fovVal');
-  fovRange.addEventListener('input',()=>{fovVal.textContent=fovRange.value;});
+  // Slider FOV (0 à 10)
+  const fov = document.getElementById('fov');
+  const fovOut = document.getElementById('fovOut');
+  const updateFov = ()=> fovOut.textContent = fov.value;
+  fov.addEventListener('input', updateFov); updateFov();
 
-  // Radios
-  document.querySelectorAll('.radio').forEach(r=>{
-    r.addEventListener('click',()=>{
-      const name=r.dataset.name;
-      document.querySelectorAll(`.radio[data-name="${name}"]`).forEach(x=>x.setAttribute('aria-checked','false'));
-      r.setAttribute('aria-checked','true');
-      toast('Tipo: ' + r.textContent.trim());
-    });
-    r.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();r.click();} });
-  });
+  // Onglets
+  const tabAux = document.getElementById('tab-aux');
+  const tabInfo = document.getElementById('tab-info');
+  const panelAux = document.getElementById('panel-aux');
+  const panelInfo = document.getElementById('panel-info');
 
-  // INJETAR: affiche un récap propre (aucune action réelle)
-  document.getElementById('inject').addEventListener('click',()=>{
-    const state = {
-      auxilio: document.querySelector('.option[data-key="auxilio"]').getAttribute('data-active')==='true',
-      precisao: document.querySelector('.option[data-key="precisao"]').getAttribute('data-active')==='true',
-      precisao_val: precRange.value,
-      target: document.getElementById('target').value,
-      tipo: ([...document.querySelectorAll('.radio[data-name="tipo"]')].find(x=>x.getAttribute('aria-checked')==='true')||{}).dataset?.value || null,
-      fov: fovRange.value
-    };
-    const lines = [
-      'Resumo aplicado (simulado):',
-      `• Auxílio: ${state.auxilio ? 'ON' : 'OFF'}`,
-      `• Precisão: ${state.precisao ? 'ON' : 'OFF'} (valor ${state.precisao_val})`,
-      `• Target: ${state.target}`,
-      `• Tipo: ${state.tipo || '-'}`,
-      `• FOV: ${state.fov}`
-    ];
-    toast('Config enviada');
-    // petit modal léger
-    const d=document.createElement('div');
-    d.style.position='fixed';d.style.inset='0';d.style.background='rgba(0,0,0,.55)';d.style.zIndex='60';
-    d.innerHTML=`<div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#111827;border:1px solid rgba(255,255,255,.08);color:#e5e7eb;max-width:92vw;width:420px;border-radius:12px;padding:14px;box-shadow:0 20px 48px rgba(0,0,0,.6)">
-      <div style="font-weight:700;margin-bottom:8px">Resumo</div>
-      <pre style="white-space:pre-wrap;line-height:1.35;font-size:13px">${lines.join('\n')}</pre>
-      <button id="closeM" style="margin-top:12px;width:100%;height:42px;border-radius:10px;background:#fff;color:#000;font-weight:700">OK</button>
-    </div>`;
-    document.body.appendChild(d);
-    d.querySelector('#closeM').onclick=()=>document.body.removeChild(d);
+  function selectTab(which){
+    const aux = which==='aux';
+    tabAux.setAttribute('aria-selected', aux);
+    tabInfo.setAttribute('aria-selected', !aux);
+    panelAux.hidden = !aux;
+    panelInfo.hidden = aux;
+  }
+  tabAux.addEventListener('click', ()=>selectTab('aux'));
+  tabInfo.addEventListener('click', ()=>selectTab('info'));
+
+  // 🔹 Quand on clique sur "INJETAR FUNÇÕES NO JOGO", ouvrir Free Fire
+  document.getElementById("openFF").addEventListener("click", ()=>{
+      window.location.href = "freefire://";
   });
-})();
 </script>
 </body>
 </html>
