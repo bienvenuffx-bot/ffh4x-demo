@@ -3,305 +3,228 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>mhd — Painel com fundo ligado</title>
+<title>mhd — Painel (interativo)</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  :root{
-    --bg:#08090b;
-    --card:#14171b;
-    --muted:rgba(255,255,255,0.62);
-    --accent:#E6EDF3;
-    --pill-border: rgba(255,255,255,0.12);
-    --active-border: rgba(52,211,153,0.12);
-  }
-  html,body{height:100%}
-  body{margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; background:var(--bg); color:var(--accent); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; overflow:auto}
-  /* full-screen canvas background */
-  #bgCanvas{position:fixed;inset:0;z-index:0;display:block}
-  /* content panel front */
+  :root{--bg:#08090b;--card:#14171b;--accent:#E6EDF3;--pill:rgba(255,255,255,.12);--active:rgba(52,211,153,.12)}
+  html,body{height:100%}body{margin:0;background:var(--bg);color:var(--accent);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+  #bg{position:fixed;inset:0;z-index:0}
   .wrap{position:relative;z-index:5;max-width:440px;margin:18px auto;padding:14px}
-  .panel{background:rgba(20,23,27,0.90);border-radius:14px;padding:14px;box-shadow:0 12px 36px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.02)}
+  .panel{background:rgba(20,23,27,.92);border-radius:14px;padding:14px;box-shadow:0 12px 36px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.03)}
   .title{font-weight:700;font-size:18px;text-align:center;letter-spacing:1px}
-  .tabs{display:flex;gap:8px;margin-top:12px;border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.02)}
-  .tab{flex:1;padding:10px 12px;text-align:center;font-weight:600;color:rgba(255,255,255,0.65);cursor:pointer}
-  .tab.active{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));color:var(--accent)}
+  .tabs{display:flex;gap:8px;margin-top:12px;border-radius:10px;overflow:hidden;background:rgba(255,255,255,.02)}
+  .tab{flex:1;padding:10px 12px;text-align:center;font-weight:600;color:rgba(255,255,255,.65);cursor:pointer}
+  .tab.active{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));color:var(--accent)}
+  [data-pane]{display:none}.show{display:block}
 
-  /* option line */
-  .option{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px;border-radius:12px;margin-top:12px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02);transition:all .18s}
-  .option .left{max-width:78%}
-  .opt-title{font-weight:600;color:var(--accent)}
-  .opt-desc{font-size:13px;color:rgba(255,255,255,0.65);margin-top:6px;line-height:1.15}
-  .badge{width:36px;height:36px;border-radius:999px;border:1.5px solid var(--pill-border);display:flex;align-items:center;justify-content:center}
-  .checkdot{width:14px;height:14px;border-radius:999px;background:#34d399;opacity:0;transform:scale(.9);transition:all .15s}
-  .option[data-active="true"]{background:linear-gradient(180deg, rgba(52,211,153,0.03), rgba(52,211,153,0.01));border:1px solid var(--active-border)}
-  .option[data-active="true"] .checkdot{opacity:1;transform:scale(1)}
-  .option[data-active="false"]{filter:grayscale(.08);opacity:.94}
-
-  .sep{height:1px;background:rgba(255,255,255,0.03);margin:14px 0;border-radius:2px}
-
+  .option{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px;border-radius:12px;margin-top:12px;background:rgba(255,255,255,.01);border:1px solid rgba(255,255,255,.03);transition:all .18s}
+  .option .left{max-width:78%}.opt-title{font-weight:600}.opt-desc{font-size:13px;color:rgba(255,255,255,.65);margin-top:6px}
+  .badge{width:36px;height:36px;border-radius:999px;border:1.5px solid var(--pill);display:flex;align-items:center;justify-content:center}
+  .dot{width:14px;height:14px;border-radius:999px;background:#34d399;opacity:0;transform:scale(.9);transition:all .15s}
+  .option[data-active="true"]{background:linear-gradient(180deg,rgba(52,211,153,.05),rgba(52,211,153,.02));border-color:var(--active)}
+  .option[data-active="true"] .dot{opacity:1;transform:scale(1)}
+  .sep{height:1px;background:rgba(255,255,255,.05);margin:14px 0;border-radius:2px}
   .row{display:flex;align-items:center;gap:12px}
   input[type="range"]{width:100%}
-  .small-label{font-size:13px;color:rgba(255,255,255,0.65)}
-
-  .fake-select{width:100%;padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.02);color:var(--accent)}
-
-  .radio-row{display:flex;gap:12px;align-items:center;margin-top:8px}
-  .radio{display:flex;align-items:center;gap:8px;background:transparent;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;color:rgba(255,255,255,0.75)}
-  .radio[data-on="true"]{border-color:var(--active-border);background:linear-gradient(180deg, rgba(52,211,153,0.03), rgba(52,211,153,0.01));color:var(--accent)}
-
-  .inject{display:block;margin-top:16px;padding:14px;border-radius:12px;background:#ffffff;color:#000;font-weight:800;text-align:center;letter-spacing:0.6px;box-shadow:0 10px 28px rgba(0,0,0,0.5)}
-  .foot{font-size:13px;color:rgba(255,255,255,0.6);text-align:center;margin-top:12px}
-
-  /* responsive margin at bottom so canvas peeks nicely */
-  @media (max-width:520px){ .wrap{padding:8px} .panel{padding:12px} }
+  .small{font-size:13px;color:rgba(255,255,255,.7)}
+  .select{width:100%;padding:10px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);color:var(--accent)}
+  .radios{display:flex;gap:12px;margin-top:8px}
+  .radio{padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.06);cursor:pointer;color:rgba(255,255,255,.8)}
+  .radio[aria-checked="true"]{border-color:var(--active);background:linear-gradient(180deg,rgba(52,211,153,.05),rgba(52,211,153,.02));color:var(--accent)}
+  .btn{display:block;margin-top:16px;padding:14px;border-radius:12px;background:#fff;color:#000;font-weight:800;text-align:center;letter-spacing:.6px;box-shadow:0 10px 28px rgba(0,0,0,.5)}
+  .foot{font-size:13px;color:rgba(255,255,255,.6);text-align:center;margin-top:12px}
+  /* Snackbar */
+  .snack{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(120%);background:#111827;color:#e5e7eb;border:1px solid rgba(255,255,255,.08);padding:10px 14px;border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.6);z-index:50;opacity:0;transition:transform .2s, opacity .2s}
+  .snack.show{transform:translateX(-50%) translateY(0);opacity:1}
 </style>
 </head>
 <body>
 
-<!-- Background canvas (nodes + connecting lines) -->
-<canvas id="bgCanvas"></canvas>
+<canvas id="bg"></canvas>
 
-<!-- Foreground UI -->
 <div class="wrap">
-  <div class="panel" role="region" aria-label="Painel mhd">
+  <div class="panel">
     <div class="title">mhd</div>
 
-    <!-- tabs -->
-    <div class="tabs" role="tablist" aria-label="Tabs">
+    <div class="tabs" role="tablist">
       <div class="tab active" data-tab="aim">Aimbot</div>
       <div class="tab" data-tab="info">Info</div>
     </div>
 
-    <!-- content -->
-    <div id="content" style="margin-top:12px">
-      <div id="options">
-        <div class="option" data-key="ativar_auxilio" data-active="false" role="button" tabindex="0">
-          <div class="left">
-            <div class="opt-title">Ativar Auxílio</div>
-            <div class="opt-desc">Ativa funções de auxílio.</div>
-          </div>
-          <div class="badge" aria-hidden="true"><span class="checkdot"></span></div>
+    <!-- PANE AIMBOT -->
+    <section id="pane-aim" data-pane class="show">
+      <div class="option" data-key="auxilio" data-active="false" role="button" tabindex="0">
+        <div class="left">
+          <div class="opt-title">Ativar Auxílio</div>
+          <div class="opt-desc">Ativa funções de auxílio.</div>
         </div>
-
-        <div class="option" data-key="ativar_precisao" data-active="false" role="button" tabindex="0">
-          <div class="left">
-            <div class="opt-title">Ativar Precisão</div>
-            <div class="opt-desc">Melhora a precisão automática.</div>
-          </div>
-          <div class="badge" aria-hidden="true"><span class="checkdot"></span></div>
-        </div>
-
-        <div class="sep"></div>
-
-        <div style="margin-top:6px">
-          <div class="row">
-            <div class="small-label">Precisão</div>
-            <div style="min-width:36px;text-align:right;color:var(--accent);" id="precVal">0</div>
-          </div>
-          <input id="precRange" type="range" min="0" max="100" value="0" />
-        </div>
-
-        <div style="margin-top:12px">
-          <select id="targetSelect" class="fake-select" aria-label="Target select">
-            <option>Auxilio Head</option>
-            <option>Auxilio Body</option>
-            <option>Auxilio Chest</option>
-          </select>
-        </div>
-
-        <div class="sep"></div>
-
-        <div style="text-align:center;color:rgba(255,255,255,0.75);font-weight:600">Tipo de Aimbot:</div>
-        <div class="radio-row" style="margin-top:8px">
-          <div class="radio" data-name="tipo" data-value="atirar" data-on="false" role="button" tabindex="0">Ao Atirar</div>
-          <div class="radio" data-name="tipo" data-value="olhar" data-on="false" role="button" tabindex="0">Ao Olhar</div>
-        </div>
+        <div class="badge"><span class="dot"></span></div>
       </div>
-    </div>
 
+      <div class="option" data-key="precisao" data-active="false" role="button" tabindex="0">
+        <div class="left">
+          <div class="opt-title">Ativar Precisão</div>
+          <div class="opt-desc">Melhora a precisão automática.</div>
+        </div>
+        <div class="badge"><span class="dot"></span></div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <div class="small">Precisão</div>
+        <div id="precVal" style="min-width:36px;text-align:right">0</div>
+      </div>
+      <input id="precRange" type="range" min="0" max="100" value="0" />
+
+      <div style="margin-top:12px">
+        <select id="target" class="select">
+          <option>Auxilio Head</option><option>Auxilio Body</option><option>Auxilio Chest</option>
+        </select>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="small" style="text-align:center">Tipo de Aimbot:</div>
+      <div class="radios">
+        <div class="radio" role="radio" aria-checked="false" data-name="tipo" data-value="atirar" tabindex="0">Ao Atirar</div>
+        <div class="radio" role="radio" aria-checked="false" data-name="tipo" data-value="olhar" tabindex="0">Ao Olhar</div>
+      </div>
+    </section>
+
+    <!-- PANE INFO -->
+    <section id="pane-info" data-pane>
+      <div class="option" data-active="true" style="cursor:default">
+        <div class="left">
+          <div class="opt-title">Nome do Criador</div>
+          <div class="opt-desc">Mohamed iOS</div>
+        </div>
+        <div class="badge"><span class="dot" style="opacity:1;transform:scale(1)"></span></div>
+      </div>
+
+      <div class="option" data-active="true" style="cursor:default">
+        <div class="left">
+          <div class="opt-title">Cellular</div>
+          <div class="opt-desc">iPhone 12</div>
+        </div>
+        <div class="badge"><span class="dot" style="opacity:1;transform:scale(1)"></span></div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <div class="small">FOV</div>
+        <div id="fovVal" style="min-width:36px;text-align:right">0</div>
+      </div>
+      <input id="fovRange" type="range" min="0" max="10" value="0" step="1" />
+    </section>
   </div>
 
-  <button id="injectBtn" class="inject">INJETAR FUNÇÕES NO JOGO</button>
-  <div class="foot">Maquette UI — não injeta nem ativa funções reais.</div>
+  <button id="inject" class="btn">INJETAR FUNÇÕES NO JOGO</button>
+  <div class="foot">Maquette UI — nenhuma função real é injetada.</div>
 </div>
 
-<!-- SCRIPT: canvas background + UI interactions -->
+<!-- Snackbar -->
+<div id="snack" class="snack"></div>
+
 <script>
-/* ----------------------------
-   Background: particles + connecting lines
-   Lightweight, mobile-aware, adaptive
-   ---------------------------- */
-
+/* ===== BG: lignes reliées (léger) ===== */
 (function(){
-  const canvas = document.getElementById('bgCanvas');
-  const ctx = canvas.getContext('2d', { alpha: true });
-  let width = canvas.width = innerWidth;
-  let height = canvas.height = innerHeight;
-  let DPR = Math.max(1, window.devicePixelRatio || 1);
-  canvas.width = width * DPR;
-  canvas.height = height * DPR;
-  canvas.style.width = width + 'px';
-  canvas.style.height = height + 'px';
-  ctx.scale(DPR, DPR);
-
-  // Config
-  const NODE_COUNT = Math.max(12, Math.floor((width * height) / 12000)); // density scale
-  const MAX_DIST = Math.min(220, Math.max(80, Math.min(width, height) / 6));
-  const nodes = [];
-
-  function rand(min,max){ return Math.random()*(max-min)+min; }
-
-  // Create nodes with random positions & small velocity
-  for(let i=0;i<NODE_COUNT;i++){
-    nodes.push({
-      x: rand(0,width),
-      y: rand(0,height),
-      vx: rand(-0.25,0.25),
-      vy: rand(-0.25,0.25),
-      r: rand(1.6,3.2),
-      phase: Math.random()*Math.PI*2
-    });
-  }
-
-  // Add a moving "pointer" node to make lines react to pointer/touch
-  const pointer = { x: width/2, y: height/2, r: 0, active: false };
-  nodes.push(pointer);
-
-  // Resize handling
-  function resize(){
-    width = canvas.width = innerWidth;
-    height = canvas.height = innerHeight;
-    DPR = Math.max(1, window.devicePixelRatio || 1);
-    canvas.width = width * DPR;
-    canvas.height = height * DPR;
-    canvas.style.width = width + 'px';
-    canvas.style.height = height + 'px';
-    ctx.scale(DPR, DPR);
-  }
-  addEventListener('resize', ()=>{ resize(); });
-
-  // Animation loop
-  let last = performance.now();
-  function tick(now){
-    const dt = (now - last) * 0.001;
-    last = now;
-    update(dt);
-    draw();
-    requestAnimationFrame(tick);
-  }
-
-  function update(dt){
-    // move nodes
-    for(let i=0;i<nodes.length-1;i++){ // exclude pointer for autonomous movement
-      const n = nodes[i];
-      n.x += n.vx * (1 + Math.sin(n.phase) * 0.6) * 16 * dt;
-      n.y += n.vy * (1 + Math.cos(n.phase) * 0.6) * 16 * dt;
-      n.phase += dt * 0.6;
-      // bounce on edges softly
-      if(n.x < -10){ n.x = -10; n.vx *= -1; }
-      if(n.y < -10){ n.y = -10; n.vy *= -1; }
-      if(n.x > width+10){ n.x = width+10; n.vx *= -1; }
-      if(n.y > height+10){ n.y = height+10; n.vy *= -1; }
-    }
-    // pointer drifts slowly when inactive
-    if(!pointer.active){
-      pointer.x += Math.sin(now*0.0003)*10*dt;
-      pointer.y += Math.cos(now*0.0002)*8*dt;
-    }
-  }
-
-  function draw(){
-    // clear
-    ctx.clearRect(0,0,width,height);
-    // subtle background gradient overlay
-    const g = ctx.createLinearGradient(0,0,width,height);
-    g.addColorStop(0, 'rgba(10,12,15,0.35)');
-    g.addColorStop(1, 'rgba(2,4,6,0.35)');
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,width,height);
-
-    // draw connections
-    for(let i=0;i<nodes.length;i++){
-      const a = nodes[i];
-      for(let j=i+1;j<nodes.length;j++){
-        const b = nodes[j];
-        const dx = a.x - b.x;
-        const dy = a.y - b.y;
-        const d2 = dx*dx + dy*dy;
-        if(d2 <= MAX_DIST * MAX_DIST){
-          const d = Math.sqrt(d2);
-          const alpha = 0.18 * (1 - (d / MAX_DIST));
-          ctx.beginPath();
-          ctx.strokeStyle = `rgba(120,140,200,${alpha})`;
-          ctx.lineWidth = 0.9;
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
-          ctx.stroke();
-        }
-      }
-    }
-
-    // draw nodes
-    for(let n of nodes){
-      // small glow for pointer node
-      if(n === pointer){
-        if(pointer.active){
-          ctx.beginPath();
-          ctx.fillStyle = 'rgba(52,211,153,0.06)';
-          ctx.arc(n.x, n.y, 28, 0, Math.PI*2);
-          ctx.fill();
-        }
-        continue; // pointer dot is not drawn as normal node
-      }
-      ctx.beginPath();
-      ctx.fillStyle = 'rgba(200,210,255,0.06)';
-      ctx.arc(n.x, n.y, n.r+0.8, 0, Math.PI*2);
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.fillStyle = 'rgba(200,210,255,0.12)';
-      ctx.arc(n.x, n.y, n.r*0.6, 0, Math.PI*2);
-      ctx.fill();
-    }
-
-    // draw pointer dot (small)
-    ctx.beginPath();
-    ctx.fillStyle = 'rgba(180,200,255,0.14)';
-    ctx.arc(pointer.x, pointer.y, 3.2, 0, Math.PI*2);
-    ctx.fill();
-  }
-
-  // pointer interaction (mouse / touch)
-  function onPointerMove(x,y){
-    pointer.x = x;
-    pointer.y = y;
-    pointer.active = true;
-    // set a timer to mark it inactive after a while
-    clearTimeout(pointer._t);
-    pointer._t = setTimeout(()=>{ pointer.active = false; }, 900);
-  }
-
-  addEventListener('mousemove', (e)=> onPointerMove(e.clientX, e.clientY));
-  addEventListener('touchstart', (e)=>{ if(e.touches && e.touches[0]) onPointerMove(e.touches[0].clientX, e.touches[0].clientY); }, {passive:true});
-  addEventListener('touchmove', (e)=>{ if(e.touches && e.touches[0]) onPointerMove(e.touches[0].clientX, e.touches[0].clientY); }, {passive:true});
-
-  requestAnimationFrame(tick);
-
+  const c=document.getElementById('bg'),x=c.getContext('2d',{alpha:true});
+  let W=innerWidth,H=innerHeight,D=window.devicePixelRatio||1;
+  function res(){W=innerWidth;H=innerHeight;D=window.devicePixelRatio||1;c.width=W*D;c.height=H*D;c.style.width=W+'px';c.style.height=H+'px';x.setTransform(D,0,0,D,0,0);}
+  res(); addEventListener('resize',res);
+  const N=Math.max(12,Math.floor((W*H)/12000)),R=Math.min(220,Math.max(80,Math.min(W,H)/6));
+  const P=[];const rnd=(a,b)=>Math.random()*(b-a)+a;
+  for(let i=0;i<N;i++)P.push({x:rnd(0,W),y:rnd(0,H),vx:rnd(-.25,.25),vy:rnd(-.25,.25),r:rnd(1.6,3.2),ph:Math.random()*6.28});
+  const ptr={x:W/2,y:H/2};P.push(ptr);
+  let last=performance.now();
+  function loop(t){const dt=(t-last)*.001;last=t;
+    for(let i=0;i<P.length-1;i++){const n=P[i];n.x+=n.vx*(1+Math.sin(n.ph)*.6)*16*dt;n.y+=n.vy*(1+Math.cos(n.ph)*.6)*16*dt;n.ph+=dt*.6;
+      if(n.x<-10||n.x>W+10)n.vx*=-1;if(n.y<-10||n.y>H+10)n.vy*=-1;}
+    x.clearRect(0,0,W,H);
+    const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,'rgba(10,12,15,.35)');g.addColorStop(1,'rgba(2,4,6,.35)');x.fillStyle=g;x.fillRect(0,0,W,H);
+    for(let i=0;i<P.length;i++){for(let j=i+1;j<P.length;j++){const a=P[i],b=P[j],dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy;if(d2<=R*R){const d=Math.sqrt(d2),al=.18*(1-d/R);x.beginPath();x.strokeStyle=`rgba(120,140,200,${al})`;x.lineWidth=.9;x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke();}}}
+    for(const n of P){if(n===ptr)continue;x.beginPath();x.fillStyle='rgba(200,210,255,.06)';x.arc(n.x,n.y,n.r+.8,0,6.28);x.fill();x.beginPath();x.fillStyle='rgba(200,210,255,.12)';x.arc(n.x,n.y,n.r*.6,0,6.28);x.fill();}
+    x.beginPath();x.fillStyle='rgba(180,200,255,.14)';x.arc(ptr.x,ptr.y,3.2,0,6.28);x.fill();
+    requestAnimationFrame(loop);}
+  requestAnimationFrame(loop);
+  addEventListener('mousemove',e=>{ptr.x=e.clientX;ptr.y=e.clientY});
+  addEventListener('touchmove',e=>{if(e.touches[0]){ptr.x=e.touches[0].clientX;ptr.y=e.touches[0].clientY}}, {passive:true});
 })();
 
-/* ----------------------------
-   UI interactions (options toggle, slider, radio, inject)
-   ---------------------------- */
-
+/* ===== UI interactive ===== */
 (function(){
-  // Toggle option active on click/keyboard
-  document.querySelectorAll('.option').forEach(opt=>{
-    opt.addEventListener('click', ()=> {
-      const cur = opt.getAttribute('data-active') === 'true';
-      opt.setAttribute('data-active', (!cur).toString());
+  const snack = document.getElementById('snack');
+  function toast(t){snack.textContent=t;snack.classList.add('show');setTimeout(()=>snack.classList.remove('show'),1200);}
+
+  // Tabs
+  const tabs=document.querySelectorAll('.tab');
+  const panes={aim:document.getElementById('pane-aim'),info:document.getElementById('pane-info')};
+  tabs.forEach(t=>t.addEventListener('click',()=>{
+    tabs.forEach(x=>x.classList.remove('active')); t.classList.add('active');
+    Object.values(panes).forEach(p=>p.classList.remove('show'));
+    panes[t.dataset.tab].classList.add('show');
+  }));
+
+  // Options toggle
+  document.querySelectorAll('.option[role="button"]').forEach(opt=>{
+    opt.addEventListener('click',()=>{
+      const on = opt.getAttribute('data-active')==='true';
+      opt.setAttribute('data-active', (!on).toString());
+      toast((!on?'Ativado: ':'Desativado: ') + opt.querySelector('.opt-title').textContent.trim());
     });
-    opt.addEventListener('keydown', (e)=> { if(e.key==='Enter' || e.key===' ') { e.preventDefault(); opt.click(); } });
+    opt.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();opt.click();} });
   });
 
-  // Slider display value
-  const precRange = document.get
+  // Sliders display
+  const precRange=document.getElementById('precRange'), precVal=document.getElementById('precVal');
+  precRange.addEventListener('input',()=>{precVal.textContent=precRange.value;});
+  const fovRange=document.getElementById('fovRange'), fovVal=document.getElementById('fovVal');
+  fovRange.addEventListener('input',()=>{fovVal.textContent=fovRange.value;});
+
+  // Radios
+  document.querySelectorAll('.radio').forEach(r=>{
+    r.addEventListener('click',()=>{
+      const name=r.dataset.name;
+      document.querySelectorAll(`.radio[data-name="${name}"]`).forEach(x=>x.setAttribute('aria-checked','false'));
+      r.setAttribute('aria-checked','true');
+      toast('Tipo: ' + r.textContent.trim());
+    });
+    r.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();r.click();} });
+  });
+
+  // INJETAR: affiche un récap propre (aucune action réelle)
+  document.getElementById('inject').addEventListener('click',()=>{
+    const state = {
+      auxilio: document.querySelector('.option[data-key="auxilio"]').getAttribute('data-active')==='true',
+      precisao: document.querySelector('.option[data-key="precisao"]').getAttribute('data-active')==='true',
+      precisao_val: precRange.value,
+      target: document.getElementById('target').value,
+      tipo: ([...document.querySelectorAll('.radio[data-name="tipo"]')].find(x=>x.getAttribute('aria-checked')==='true')||{}).dataset?.value || null,
+      fov: fovRange.value
+    };
+    const lines = [
+      'Resumo aplicado (simulado):',
+      `• Auxílio: ${state.auxilio ? 'ON' : 'OFF'}`,
+      `• Precisão: ${state.precisao ? 'ON' : 'OFF'} (valor ${state.precisao_val})`,
+      `• Target: ${state.target}`,
+      `• Tipo: ${state.tipo || '-'}`,
+      `• FOV: ${state.fov}`
+    ];
+    toast('Config enviada');
+    // petit modal léger
+    const d=document.createElement('div');
+    d.style.position='fixed';d.style.inset='0';d.style.background='rgba(0,0,0,.55)';d.style.zIndex='60';
+    d.innerHTML=`<div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#111827;border:1px solid rgba(255,255,255,.08);color:#e5e7eb;max-width:92vw;width:420px;border-radius:12px;padding:14px;box-shadow:0 20px 48px rgba(0,0,0,.6)">
+      <div style="font-weight:700;margin-bottom:8px">Resumo</div>
+      <pre style="white-space:pre-wrap;line-height:1.35;font-size:13px">${lines.join('\n')}</pre>
+      <button id="closeM" style="margin-top:12px;width:100%;height:42px;border-radius:10px;background:#fff;color:#000;font-weight:700">OK</button>
+    </div>`;
+    document.body.appendChild(d);
+    d.querySelector('#closeM').onclick=()=>document.body.removeChild(d);
+  });
+})();
+</script>
+</body>
+</html>
